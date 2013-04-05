@@ -15,28 +15,20 @@ App.prototype = {
             // Active tab
             that.tab = tab;
 
-            chrome.extension.onMessage.addListener(function (message, sender, sendResponse) {
-
-                if (message && message.type) {
-
-                    switch (message.type) {
-                        case 'media':
-                            that.parseMedia.call(that, message.data);
-                            break;
-
-                    }
-
-                }
-
-            });
-
             // Executing content script
             chrome.tabs.executeScript(tab.id, {
                 file: "scripts/content.js"
             }, function () {
-                //                chrome.tabs.sendMessage(tab.id, {
-                //                    'type': 'getMedia'
-                //                });
+                // Can send getMedia message now
+                chrome.tabs.sendMessage(tab.id, {
+                    'type': 'getMedia'
+                }, function (media) {
+                    if (media) {
+                        that.parseMedia.call(that, media);
+                    } else {
+                        console.log('Something went wrong, no media queries info was found!');
+                    }
+                });
             });
         });
 
