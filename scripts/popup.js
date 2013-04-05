@@ -24,10 +24,6 @@ App.prototype = {
                             that.parseMedia.call(that, message.data);
                             break;
 
-                        case 'snapshot':
-                            that.saveSnapshot.call(that, message.data, 'png');
-                            break;
-
                     }
 
                 }
@@ -43,53 +39,6 @@ App.prototype = {
                 //                });
             });
         });
-
-    },
-
-    saveSnapshot: function (dataURI, mimetype) {
-
-        $('<a id="snap" download="snapshot.png" href="' + dataURI + '">download</a>').appendTo(document.body).delay(1000).click();
-
-        //
-        //
-        //        // convert base64 to raw binary data held in a string
-        //        // doesn't handle URLEncoded DataURIs
-        //        var byteString = atob(dataURI.split(',')[1]);
-        //
-        //        // separate out the mime component
-        //        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        //
-        //        // write the bytes of the string to an ArrayBuffer
-        //        var ab = new ArrayBuffer(byteString.length);
-        //        var ia = new Uint8Array(ab);
-        //        for (var i = 0; i < byteString.length; i++) {
-        //            ia[i] = byteString.charCodeAt(i);
-        //        }
-        //
-        //        // create a blob for writing to a file
-        //        var blob = new Blob([ab], {
-        //            type: mimeString
-        //        });
-        //
-        //        function errorHandler(error) {
-        //            console.log('Saving file failed!');
-        //        }
-        //
-        //        function onwriteend() {
-        //            // open the file that now contains the blob
-        //            window.open('filesystem:chrome-extension://' + chrome.i18n.getMessage("@@extension_id") + '/temporary/' + name);
-        //        }
-        //
-        //        window.webkitRequestFileSystem(TEMPORARY, 1024 * 1024, function (fs) {
-        //            fs.root.getFile(name, {
-        //                create: true
-        //            }, function (fileEntry) {
-        //                fileEntry.createWriter(function (fileWriter) {
-        //                    fileWriter.onwriteend = onwriteend;
-        //                    fileWriter.write(blob);
-        //                }, errorHandler);
-        //            }, errorHandler);
-        //        }, errorHandler);
 
     },
 
@@ -481,29 +430,3 @@ App.prototype = {
     }
 };
 (new App).execute();
-
-//    document.getElementById('btn-capture').onclick = function captureScreens() {
-//
-//        chrome.windows.create({
-//            url: 'http://onet.pl',
-//            width: 480,
-//            height: 1024
-//        }, function (newWindow) {
-//
-//            chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
-//                if (changeInfo.status === 'complete') {
-//
-//                    console.log('loading tab complete');
-//
-//                    chrome.tabs.captureVisibleTab(newWindow.id, function (dataUrl) {
-//                        console.log(dataUrl);
-//
-//                        // http://stackoverflow.com/questions/6431281/save-png-canvas-image-to-html5-storage-javascript
-//                    });
-//
-//                }
-//            });
-//
-//        });
-//
-//    }
