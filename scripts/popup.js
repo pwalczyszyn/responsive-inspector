@@ -15,7 +15,7 @@ App.prototype = {
             // Active tab
             that.tab = tab;
 
-            chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+            chrome.extension.onMessage.addListener(function (message, sender, sendResponse) {
 
                 if (message && message.type) {
 

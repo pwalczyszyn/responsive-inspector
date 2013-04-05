@@ -34,7 +34,7 @@ for (var i in document.styleSheets) {
 }
 
 // Send results back to popup
-chrome.runtime.sendMessage({
+chrome.extension.sendMessage({
     type: 'media',
     data: media
 });

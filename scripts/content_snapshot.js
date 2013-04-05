@@ -27,7 +27,7 @@ if (!window.isSnapshotInitialized) {
             callback(true);
         }
 
-        chrome.runtime.onMessage.addListener(function onMessage(request, sender, callback) {
+        chrome.extension.onMessage.addListener(function onMessage(request, sender, callback) {
 
             if (request) {
 
