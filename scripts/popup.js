@@ -342,7 +342,7 @@ App.prototype = {
         }
 
         that.showSnapshot = true;
-        that.$snapshot.css('left', event.pageX - 17).appendTo(document.body).fadeIn('fast');
+        that.$snapshot.css('left', event.pageX - 21).appendTo(document.body).fadeIn('fast');
     },
 
     ruler_mouseLeaveHandler: function (event) {
@@ -360,7 +360,7 @@ App.prototype = {
 
         that.$snapshot.html(currentValue + 'px')
             .data('currentValue', currentValue)
-            .css('left', event.pageX - 17);
+            .css('left', event.pageX - 21);
     },
 
     snapshot_mouseEnterHandler: function (event) {
