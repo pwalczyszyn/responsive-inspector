@@ -1,0 +1,191 @@
+body {
+    color: #bbb;
+    font: 12px verdana;
+    font-weight:100;
+    margin: 0;
+    height: 100%;
+    width: 660px;
+    border-radius: 5px;
+    padding:3px;
+
+}
+* {
+    box-sizing: border-box;
+}
+h2 {
+    margin-top:5px;
+    margin-bottom:5px;
+}
+div {
+    margin:0;
+    padding:0;
+}
+
+header {
+    height:50px;
+}
+
+.app-name {
+    font: 20px arial;
+    font-weight:bold;
+    color:#000;
+    line-height: 50px;
+    padding-left: 10px;
+}
+
+#content {
+    position:relative;
+    background-color: #3a3f42;
+    height:350px;
+    padding:15px;
+}
+
+#media-queries-container {
+    position:relative;
+    width:100%;
+    height:100%;
+}
+
+#media-queries-ruler {
+    position:absolute;
+    height:20px;
+    width:100%;
+    overflow:hidden;
+    white-space: nowrap;
+    font-size:8px;
+    font-weight:100;
+}
+
+.ruler-segment {
+    display: inline-block;
+    padding-left:2px;
+    height:100%;
+    background: url('../images/ruler-high-bar.png') 0% 0% no-repeat, 
+        url('../images/ruler-low-bar.png') 25% 0% no-repeat, 
+        url('../images/ruler-mid-bar.png') 50% 0% no-repeat, 
+        url('../images/ruler-low-bar.png') 75% 0% no-repeat;
+}
+
+.snapshot {
+    position:absolute;
+    width:42px;
+    height:45px;
+    top:30px;
+    color:#b7b7b7;
+    background: url('../images/ico-camera.png') 50% 4px no-repeat, url('../images/snapshot.png') 0 0 no-repeat;
+    font-size:8px;
+    font-weight:100;
+    padding-top:22px;
+    text-align:center;
+}
+
+.snapshot:hover {
+    color:#fff;
+    cursor:pointer;
+}
+
+#lst-media-queries-container {
+    position:absolute;
+    overflow:scroll;
+    top:20px;
+    bottom:0;
+    width:100%;
+    border-radius: 4px;
+    box-shadow: rgb(0, 0, 0) 0px 0px 150px 0px inset;
+    padding:1px;
+}
+#lst-media-queries {
+    padding: 0;
+    margin: 0 0 0;
+}
+#lst-media-queries > li {
+    position:relative;
+    display:block;
+    height:36px;
+    width:100%;
+    overflow:hidden;
+    opacity:0.8;
+    border-bottom:rgb(70, 70, 70) solid 1px;
+}
+#lst-media-queries > li:hover {
+    opacity:1;
+    background-color:#1c1c1c;
+}
+.media-query-bar {
+    position:absolute;
+    height:100%;
+    overflow:hidden;
+    border-radius: 4px;
+    background: -webkit-linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(0,0,0,0.137255) 100%);
+}
+
+#lst-media-queries > li:hover > .media-query-bar {
+    background:url('../images/ico-eye.png') no-repeat 50% 50%;
+}
+#lst-media-queries > li:hover > .media-query-bar:hover {
+    cursor:pointer;
+}
+.btn-open-css {
+    position:absolute;
+    right:1px;
+    width:36px;
+    height:100%;
+    display:none;
+}
+
+#lst-media-queries > li:hover > .btn-open-css {
+    display:block;
+    background:url('../images/ico-code.png') no-repeat 50% 50%;
+    z-index:10;
+}
+
+#lst-media-queries > li:hover > .btn-open-css {
+    cursor: pointer;
+}
+.bar-min-label, .bar-max-label {
+    color:#fff;
+    position:absolute;
+    text-shadow: 1px 1px 2px #000;
+    line-height: 18px;
+    font-size:10px;
+}
+.bar-min-label {
+    padding-right:3px;
+    text-align:right;
+}
+.bar-max-label {
+    padding-left:3px;
+    text-align:left;
+}
+
+
+#snapshot {
+    display:none;
+}
+
+#snapshot.visible {
+    position:absolute;
+    display:table;
+    width:100%;
+    height:100%;
+    background-color:#3a3f42;
+    z-index:20;    
+}
+
+#snapshot-content {
+
+    display:table-cell;
+    vertical-align:middle;
+    height:100%;
+}
+
+#snapshot-content > div {
+    margin: auto;
+    text-align:center;
+    font-size:14px;
+}
+
+
+#snapshot-content > div > img {
+    margin-bottom:15px;
+}
