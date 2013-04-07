@@ -330,7 +330,7 @@ App.prototype = {
 
     },
 
-    drawRuler: function (maxValue) {
+    drawRuler: function drawRuler(maxValue) {
         var $ruler = $('#media-queries-ruler'),
             SEGMENT_PX = 250,
             segmentWidth = SEGMENT_PX / maxValue * 100,
@@ -355,72 +355,105 @@ App.prototype = {
         }, this.ruler_mouseLeaveHandler);
     },
 
-    $snapshot: null,
-    showSnapshot: false,
+    $widthMarker: null,
+    showWidthMarker: false,
+    prevRulerPageX: null,
 
-    ruler_mouseEnterHandler: function (event) {
+    ruler_mouseEnterHandler: function ruler_mouseEnterHandler(event) {
         var that = event.data.that;
 
-        if (!that.$snapshot) {
-            that.$snapshot = $('<div class="snapshot"></div>');
-            that.$snapshot.mouseenter({
+        if (!that.$widthMarker) {
+            that.$widthMarker = $('<div class="width-marker"></div>');
+            that.$widthMarker.mouseenter({
                 that: that
-            }, that.snapshot_mouseEnterHandler);
-            that.$snapshot.mouseleave({
+            }, that.widthMarker_mouseEnterHandler);
+            that.$widthMarker.mouseleave({
                 that: that
-            }, that.snapshot_mouseLeaveHandler);
-            that.$snapshot.click({
+            }, that.widthMarker_mouseLeaveHandler);
+            that.$widthMarker.click({
                 that: that
-            }, that.snapshot_clickHandler);
+            }, that.widthMarker_clickHandler);
         }
+        that.showWidthMarker = true;
+        that.$widthMarker.css('left', event.pageX - (that.$widthMarker.width() / 2)).appendTo(document.body).fadeIn('fast');
 
-        that.showSnapshot = true;
-        that.$snapshot.css('left', event.pageX - 21).appendTo(document.body).fadeIn('fast');
+        // Setting initial page x
+        that.prevRulerPageX = event.pageX;
     },
 
-    ruler_mouseLeaveHandler: function (event) {
+    ruler_mouseLeaveHandler: function ruler_mouseLeaveHandler(event) {
         var that = event.data.that;
-        that.hideSnapshot(that);
+        that.hideWidthMarker(that);
     },
 
-    ruler_mouseMoveHandler: function (event) {
+    ruler_mouseMoveHandler: function ruler_mouseMoveHandler(event) {
         var that = event.data.that,
             $ruler = $(this),
             rulerOffset = $ruler.offset(),
-            mouseX = event.pageX - rulerOffset.left,
             maxValue = event.data.maxValue
-            currentValue = Math.round(mouseX / $ruler.width() * maxValue);
+            currentValue = Math.round((event.pageX - rulerOffset.left) / $ruler.width() * maxValue),
+            moveDirection = event.pageX - that.prevRulerPageX < 0 ? -1 : 1;
 
-        that.$snapshot.html(currentValue + 'px')
+        // Internal function to find snapping point
+
+        function findSnapPoint(from, direction, twoWay) {
+            var at = from,
+                result = null;
+            for (var i = 0; i < 10; i++) {
+                if (bps = that.breakpoints[at]) {
+                    result = {
+                        at: at,
+                        breakpoints: bps
+                    };
+                    break;
+                }
+                at = at + direction;
+            }
+
+            if (twoWay && !result)
+                result = findSnapPoint(from, direction * -1, false);
+
+            return result;
+        }
+
+        var snapPoint = findSnapPoint(currentValue, moveDirection, true);
+        (snapPoint && (currentValue = snapPoint.at));
+
+        // Positioning marker
+        that.$widthMarker.html(currentValue + 'px')
             .data('currentValue', currentValue)
-            .css('left', event.pageX - 21);
+        // ruler left + current position inside the ruler - half of the width of $widthMarker
+        .css('left', rulerOffset.left + Math.round(currentValue / maxValue * $ruler.width()) - (that.$widthMarker.width() / 2));
+
+        // Setting previous ruler mouse x
+        that.prevRulerPageX = event.pageX;
     },
 
-    snapshot_mouseEnterHandler: function (event) {
+    widthMarker_mouseEnterHandler: function widthMarker_mouseEnterHandler(event) {
         var that = event.data.that;
-        that.showSnapshot = true;
+        that.showWidthMarker = true;
     },
 
-    snapshot_mouseLeaveHandler: function (event) {
+    widthMarker_mouseLeaveHandler: function widthMarker_mouseLeaveHandler(event) {
         var that = event.data.that;
-        that.hideSnapshot(that);
+        that.hideWidthMarker(that);
     },
 
-    hideSnapshot: function (that) {
-        that.showSnapshot = false;
+    hideWidthMarker: function hideWidthMarker(that) {
+        that.showWidthMarker = false;
         setTimeout(function () {
-            if (!that.showSnapshot)
-                that.$snapshot.fadeOut('fast', function () {
-                    that.$snapshot.detach();
+            if (!that.showWidthMarker)
+                that.$widthMarker.fadeOut('fast', function () {
+                    that.$widthMarker.detach();
                 });
         }, 200);
     },
 
-    snapshot_clickHandler: function (event) {
+    widthMarker_clickHandler: function widthMarker_clickHandler(event) {
         var that = event.data.that,
             snapshotWidth = $(this).data('currentValue');
 
-        that.hideSnapshot(that);
+        that.hideWidthMarker(that);
 
         $('#snapshot').toggleClass('visible');
 

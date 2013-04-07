@@ -66,7 +66,7 @@ header {
         url('../images/ruler-low-bar.png') 75% 0% no-repeat;
 }
 
-.snapshot {
+.width-marker {
     position:absolute;
     width:42px;
     height:45px;
@@ -79,7 +79,7 @@ header {
     text-align:center;
 }
 
-.snapshot:hover {
+.width-marker:hover {
     color:#fff;
     cursor:pointer;
 }
