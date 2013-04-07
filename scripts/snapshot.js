@@ -21,6 +21,14 @@ Snapshotter.prototype = {
             file: "scripts/content_snapshot.js"
         }, function () {
             that.getPageInfo.call(that);
+
+//            chrome.tabs.sendMessage(that.tab.id, {
+//                type: 'loadIFrame'
+//            }, function (response) {
+//
+//                console.log('response');
+//
+//            });
         });
     },
 

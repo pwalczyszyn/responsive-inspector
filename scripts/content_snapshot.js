@@ -6,8 +6,8 @@ if (!window.isSnapshotInitialized) {
 
         function getPageInfo(data, callback) {
             callback({
-                viewHeight: innerHeight,
-                viewWidth: innerWidth,
+                viewHeight: window.innerHeight,
+                viewWidth: window.innerWidth,
                 pageHeight: document.height
             });
         }
@@ -27,6 +27,28 @@ if (!window.isSnapshotInitialized) {
             callback(true);
         }
 
+        function loadIFrame(data, callback) {
+            console.log('loadIFrame');
+
+            var req = new XMLHttpRequest();
+            req.open("GET", chrome.extension.getURL('snapshot.html'), true);
+            req.onreadystatechange = function () {
+                if (req.readyState == 4 && req.status == 200) {
+
+                    var html = req.responseText;
+                    html = html.replace('{{title}}', document.title);
+                    html = html.replace('{{width}}', window.innerWidth - 20);
+                    html = html.replace('{{src}}', window.location.href);
+                    
+                    console.log('replacing html', html);
+                    
+                    document.write(html);
+
+                }
+            };
+            req.send(null);
+        }
+
         chrome.extension.onMessage.addListener(function onMessage(request, sender, callback) {
 
             if (request) {
@@ -34,7 +56,8 @@ if (!window.isSnapshotInitialized) {
                 var fn = {
                     'getPageInfo': getPageInfo,
                     'scrollPage': scrollPage,
-                    'scrollToTop': scrollToTop
+                    'scrollToTop': scrollToTop,
+                    'loadIFrame': loadIFrame
                 }[request.type];
 
                 if (fn) {

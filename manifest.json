@@ -17,6 +17,6 @@
     },
 
     "web_accessible_resources": [
-        "scripts/libs/run_prettify.js", "scripts/libs/html2canvas.js"
+        "snapshot.html", "scripts/libs/run_prettify.js", "scripts/libs/html2canvas.js"
     ]
 }
