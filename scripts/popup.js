@@ -388,18 +388,25 @@ App.prototype = {
 
     ruler_mouseMoveHandler: function ruler_mouseMoveHandler(event) {
         var that = event.data.that,
+            // Ruler DOM element
             $ruler = $(this),
-            rulerOffset = $ruler.offset(),
-            maxValue = event.data.maxValue
-            currentValue = Math.round((event.pageX - rulerOffset.left) / $ruler.width() * maxValue),
+            // Ruler left position
+            rulerLeft = $ruler.offset().left,
+            // Ruler max value
+            maxValue = event.data.maxValue,
+            // Current value based on mouse pageX position
+            currentValue = Math.round((event.pageX - rulerLeft) / $ruler.width() * maxValue),
+            // Direction in which mouse was moved
             moveDirection = event.pageX - that.prevRulerPageX < 0 ? -1 : 1;
 
-        // Internal function to find snapping point
-
+        /**
+         * Internal function to find snapping point
+         */
         function findSnapPoint(from, direction, twoWay) {
             var at = from,
                 result = null;
             for (var i = 0; i < 10; i++) {
+                var bps;
                 if (bps = that.breakpoints[at]) {
                     result = {
                         at: at,
@@ -416,16 +423,19 @@ App.prototype = {
             return result;
         }
 
+        // Looking for snapping point
         var snapPoint = findSnapPoint(currentValue, moveDirection, true);
+        // If snap poit found setting current value to it
         (snapPoint && (currentValue = snapPoint.at));
 
         // Positioning marker
         that.$widthMarker.html(currentValue + 'px')
+            // Binding current value with width marker
             .data('currentValue', currentValue)
         // ruler left + current position inside the ruler - half of the width of $widthMarker
-        .css('left', rulerOffset.left + Math.round(currentValue / maxValue * $ruler.width()) - (that.$widthMarker.width() / 2));
+        .css('left', rulerLeft + Math.round(currentValue / maxValue * $ruler.width()) - (that.$widthMarker.width() / 2));
 
-        // Setting previous ruler mouse x
+        // Setting previous ruler page x
         that.prevRulerPageX = event.pageX;
     },
 
