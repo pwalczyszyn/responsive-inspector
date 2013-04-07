@@ -1,14 +1,20 @@
 var App = function () {};
 App.prototype = {
 
+    tab: null,
+
     mediaQueries: null,
 
-    BAR_COLORS: ['#be9ce8', '#7ba7e5', '#5eded5', '#adcf68', '#e0da71', '#efbb6d', '#ea917e', '#e08cd0'],
-
-    tab: null,
+    breakpoints: null,
 
     execute: function () {
         var that = this;
+
+        // Initializing mediaQueries array
+        this.mediaQueries = [];
+
+        // Initializing breakpoints map
+        this.breakpoints = {};
 
         chrome.tabs.getSelected(null, function (tab) {
 
@@ -77,9 +83,6 @@ App.prototype = {
     },
 
     parseMedia: function parseMedia(media) {
-
-        // Initializing mediaQueries array
-        this.mediaQueries = [];
 
         // Counter of external CSSs to parse
         this.externalCSSsToParse = 0;
@@ -192,52 +195,79 @@ App.prototype = {
 
     },
 
+    addBreakpoints: function addBreakpoints($bar) {
+        var that = this,
+            mq = $bar.data('mq');
+
+        function addBreakpoint(val) {
+            if (val) {
+                var bmqs = that.breakpoints[val];
+                (!bmqs && (that.breakpoints[val] = bmqs = []));
+                (bmqs.indexOf($bar) == -1 && bmqs.push($bar));
+            }
+        }
+        // Adding min breakpoint
+        addBreakpoint(mq.minWidthValuePx);
+        // Adding max breakpoint
+        addBreakpoint(mq.maxWidthValuePx);
+    },
+
     showResults: function showResults() {
 
         var maxValue = 0;
 
-        // Sorting mediaQueries first
-        this.mediaQueries.sort(function (a, b) {
+        if (this.mediaQueries.length == 1) {
+            maxValue = Math.max(this.mediaQueries[0].minWidthValuePx ? this.mediaQueries[0].minWidthValuePx : 0,
+                this.mediaQueries[0].maxWidthValuePx ? this.mediaQueries[0].maxWidthValuePx : 0);
 
-            var aMin = a.minWidthValuePx != undefined ? a.minWidthValuePx : null,
-                aMax = a.maxWidthValuePx != undefined ? a.maxWidthValuePx : null,
-                bMin = b.minWidthValuePx != undefined ? b.minWidthValuePx : null,
-                bMax = b.maxWidthValuePx != undefined ? b.maxWidthValuePx : null,
-                max = Math.max(aMin, aMax, bMin, bMax);
+        } else if (this.mediaQueries.length > 1) {
 
-            // Setting max value
-            if (max > maxValue) maxValue = max;
+            // Sorting mediaQueries first
+            this.mediaQueries.sort(function (a, b) {
 
-            if (aMin == null) {
+                console.log(a.mediaText);
 
-                if (bMin == null)
-                    return aMax - bMax;
-                else // bMin != undefined
-                    return -1;
+                var aMin = a.minWidthValuePx != undefined ? a.minWidthValuePx : null,
+                    aMax = a.maxWidthValuePx != undefined ? a.maxWidthValuePx : null,
+                    bMin = b.minWidthValuePx != undefined ? b.minWidthValuePx : null,
+                    bMax = b.maxWidthValuePx != undefined ? b.maxWidthValuePx : null,
+                    max = Math.max(aMin, aMax, bMin, bMax);
 
-            } else { // aMin != undefined
+                // Setting max value
+                if (max > maxValue) maxValue = max;
 
-                if (bMin == null) {
-                    return 1;
-                } else { // bMin != undefined
+                if (aMin == null) {
 
-                    if (aMax == null && bMax == null) {
-                        return aMin - bMin;
-                    } else if (aMax != null && bMax != null) {
-                        return aMin - bMin;
-                    } else if (aMax == null && bMax != null) {
-                        return 1;
-                    } else if (aMax != null && bMax == null) {
+                    if (bMin == null)
+                        return aMax - bMax;
+                    else // bMin != undefined
                         return -1;
+
+                } else { // aMin != undefined
+
+                    if (bMin == null) {
+                        return 1;
+                    } else { // bMin != undefined
+
+                        if (aMax == null && bMax == null) {
+                            return aMin - bMin;
+                        } else if (aMax != null && bMax != null) {
+                            return aMin - bMin;
+                        } else if (aMax == null && bMax != null) {
+                            return 1;
+                        } else if (aMax != null && bMax == null) {
+                            return -1;
+                        }
+
                     }
-
                 }
-            }
 
-            return 0;
-        });
+                return 0;
+            });
 
-        // Adding 10% to maxValue
+        }
+
+        // Adding 16% to maxValue
         maxValue = Math.round(maxValue * 1.16);
 
         // Drawing ruler
@@ -285,6 +315,9 @@ App.prototype = {
 
             // Attaching mq to DOM element
             $item.data('mq', mq);
+
+            // Adding breakpoints
+            this.addBreakpoints($item);
 
             // Adding item to an array
             items.push($item[0]);
