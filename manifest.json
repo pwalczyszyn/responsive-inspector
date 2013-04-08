@@ -17,6 +17,6 @@
     },
 
     "web_accessible_resources": [
-        "templates/snapshot.tpl", "scripts/libs/run_prettify.js", "scripts/libs/html2canvas.js"
+        "templates/snapshot.tpl", "images/bg-pattern.png", "scripts/libs/run_prettify.js", "scripts/libs/html2canvas.js"
     ]
 }

@@ -132,13 +132,10 @@ Snapshotter.prototype = {
                                     type: 'restore'
                                 }, function (response) {
 
-
-                                    if (that.initialWindowWidth != that.currentWindow.width) {
+                                    if (that.initialWindowWidth < that.snapshotWidth) {
                                         chrome.windows.update(that.currentWindow.id, {
                                             width: that.initialWindowWidth
-                                        }, function () {
-                                            that.loadContentScript.call(that);
-                                        });
+                                        }, function () {});
                                     }
 
                                 });

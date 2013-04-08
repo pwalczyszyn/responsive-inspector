@@ -270,7 +270,7 @@ App.prototype = {
         }
 
         // Adding 16% to maxValue
-        maxValue = Math.round(maxValue * 1.16);
+        maxValue = Math.max(Math.round(maxValue * 1.16), screen.width);
 
         // Drawing ruler
         this.drawRuler(maxValue);

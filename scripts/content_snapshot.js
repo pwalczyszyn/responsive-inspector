@@ -18,8 +18,9 @@ if (!window.isSnapshotInitialized) {
 
                     var html = req.responseText;
                     html = html.replace('{{title}}', document.title);
-                    html = html.replace('{{width}}', data.snapshotWidth);
+                    html = html.replace(/\{\{width\}\}/gi, data.snapshotWidth);
                     html = html.replace('{{src}}', window.location.href);
+                    html = html.replace('{{bg-pattern}}', chrome.extension.getURL('images/bg-pattern.png'));
 
                     document.write(html);
 
