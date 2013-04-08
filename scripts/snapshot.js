@@ -1,10 +1,14 @@
-var Snapshotter = function (tab, snapshotWidth, onCompleteCallback) {
+var Snapshotter = function (tab, snapshotWidth, onUpdateCallback) {
     this.tab = tab;
     this.snapshotWidth = snapshotWidth;
-    this.onCompleteCallback = onCompleteCallback;
+    this.onUpdateCallback = onUpdateCallback;
 }
 
 Snapshotter.prototype = {
+
+    tab: null,
+
+    onUpdateCallback: null,
 
     snapshotWidth: null,
 
@@ -147,9 +151,8 @@ Snapshotter.prototype = {
     },
 
     saveSnapshot: function saveSnapshot(dataURI) {
-        var that = this;
-
-        var binary = atob(dataURI.split(',')[1]),
+        var that = this,
+            binary = atob(dataURI.split(',')[1]),
             array = [];
 
         for (var i = 0; i < binary.length; i++) {
@@ -166,12 +169,17 @@ Snapshotter.prototype = {
 
         function onwriteend() {
             // open the file that now contains the blob
-            that.onCompleteCallback('filesystem:chrome-extension://' + chrome.i18n.getMessage("@@extension_id") + '/temporary/' + name);
+            that.onUpdateCallback({
+                status: 'complete',
+                path: 'filesystem:chrome-extension://' + chrome.i18n.getMessage("@@extension_id") + '/temporary/' + name
+            });
         }
 
-        function errorHandler() {
-            console.log('Something went wrong during snapshot saving!');
-            that.onCompleteCallback(null);
+        function errorHandler(error) {
+            that.onUpdateCallback({
+                status: 'error',
+                error: error
+            });
         }
 
         // create a blob for writing to a file

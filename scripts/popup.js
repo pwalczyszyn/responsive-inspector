@@ -38,6 +38,8 @@ App.prototype = {
             });
         });
 
+
+
     },
 
     styleSheetOpen_clickHandler: function (event) {
@@ -467,20 +469,61 @@ App.prototype = {
 
         that.hideWidthMarker(that);
 
-        $('#snapshot').toggleClass('visible');
+        // Showing snapshot view
+        $('body').attr('data-state', 'progress');
 
-        // Snaphotter complete handler
-        function onSnapshotterComplete(snapshotPath) {
+        /** 
+         * Snaphotter complete handler
+         */
+        function onUpdate(updateInfo) {
 
-            $('#snapshot').toggleClass('visible');
+            if (updateInfo.status == 'complete') {
 
-            if (snapshotPath) window.open(snapshotPath);
+                that.showSnapshotPreview.call(that, updateInfo.path);
+
+            } else if (updateInfo.status == 'error') {
+
+                $('body').attr('data-state', 'media-queries');
+                alert('Error taking snapshots: ' + updateInfo.error);
+
+            }
 
         }
 
         // Taking whole page snapshot
-        (new Snapshotter(that.tab, snapshotWidth, onSnapshotterComplete)).execute();
+        (new Snapshotter(that.tab, snapshotWidth, onUpdate)).execute();
 
-    }
+    },
+
+    showSnapshotPreview: function showSnapshotPreview(path) {
+        var $preview = $('#preview');
+
+        // Set img src
+        $preview.html('<img src="' + path + '"/>');
+
+        // Make button downloadable
+        $('#btn-save').attr('download', 'snapshot.jpg').attr('href', path);
+
+        // Show preview view
+        $('body').attr('data-state', 'preview');
+
+        // Registering preview buttons handlers
+        if (!this.previewInitialized) {
+            this.previewInitialized = true;
+            $('#btn-share').click(this.btnShare_clickHandler);
+            $('#btn-discard').click(this.btnDiscard_clickHandler);
+        }
+
+    },
+
+    btnShare_clickHandler: function btnShare_clickHandler(event) {
+        alert('Coming soon!');
+    },
+
+    btnDiscard_clickHandler: function btnDiscard_clickHandler(event) {
+        $('body').attr('data-state', 'media-queries');
+    },
+
+
 };
 (new App).execute();

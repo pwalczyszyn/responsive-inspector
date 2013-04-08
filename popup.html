@@ -11,24 +11,32 @@
         <script src="scripts/snapshot.js"></script>
     </head>
     
-    <body>
+    <body data-state="media-queries">
         <header>
             <span class="app-name">Responsive Inspector</span>
+            <div id="preview-buttons">
+                <a id="btn-save">
+                    <img src="images/btn-save.png" />
+                </a>
+                <img id="btn-share" src="images/btn-share.png" />
+                <img id="btn-discard" src="images/btn-discard.png" />
+            </div>
         </header>
         <div id="content">
-            <div id="snapshot">
-                <div id="snapshot-content">
-                    <div>
-                        <img src="images/ajax-loader.gif" />
-                        <br/>Stitching snapshots...</div>
-                </div>
-            </div>
             <div id="media-queries-container">
                 <div id="media-queries-ruler"></div>
                 <div id="lst-media-queries-container">
                     <ul id="lst-media-queries"></ul>
                 </div>
             </div>
+            <div id="progress">
+                <div id="progress-content">
+                    <div>
+                        <img src="images/ajax-loader.gif" />
+                        <br/>Stitching snapshots...</div>
+                </div>
+            </div>
+            <div id="preview"></div>
         </div>
     </body>
 
