@@ -501,19 +501,33 @@ App.prototype = {
         // Set img src
         $preview.html('<img src="' + path + '"/>');
 
-        // Make button downloadable
-        $('#btn-save').attr('download', 'snapshot.jpg').attr('href', path);
-
         // Show preview view
         $('body').attr('data-state', 'preview');
 
         // Registering preview buttons handlers
         if (!this.previewInitialized) {
             this.previewInitialized = true;
-            $('#btn-share').click(this.btnShare_clickHandler);
-            $('#btn-discard').click(this.btnDiscard_clickHandler);
+            $('#btn-save').click({
+                that: this,
+                path: path
+            }, this.btnSave_clickHandler);
+            $('#btn-share').click({
+                that: this,
+                path: path
+            }, this.btnShare_clickHandler);
+            $('#btn-discard').click({
+                that: this,
+                path: path
+            }, this.btnDiscard_clickHandler);
         }
 
+    },
+
+    btnSave_clickHandler: function btnShare_clickHandler(event) {
+        var a = document.createElement('a');
+        a.href = event.data.path;
+        a.download = 'snapshot.jpg'; // Filename
+        a.click();
     },
 
     btnShare_clickHandler: function btnShare_clickHandler(event) {

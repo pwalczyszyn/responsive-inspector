@@ -170,7 +170,7 @@ Snapshotter.prototype = {
         }),
 
             // come up with a filename
-            name = 'snapshot-' + that.snapshotWidth + 'x' + that.pageHeight + '.jpg';
+            name = 'snapshot.jpg'; // -' + that.snapshotWidth + 'x' + that.pageHeight + '
 
         function onwriteend() {
             // open the file that now contains the blob
