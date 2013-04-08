@@ -7,7 +7,7 @@ body {
     width: 660px;
     border-radius: 5px;
     padding:3px;
-
+    overflow-y: auto;
 }
 * {
     box-sizing: border-box;
@@ -20,11 +20,9 @@ div {
     margin:0;
     padding:0;
 }
-
 header {
     height:50px;
 }
-
 .app-name {
     font: 20px arial;
     font-weight:bold;
@@ -32,20 +30,38 @@ header {
     line-height: 50px;
     padding-left: 10px;
 }
-
 #content {
     position:relative;
     background-color: #3a3f42;
     height:350px;
     padding:15px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
-
+#content::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+#content::-webkit-scrollbar-button:start:decrement, #content::-webkit-scrollbar-button:end:increment {
+    height: 30px;
+    display: block;
+    background-color: transparent;
+}
+#content::-webkit-scrollbar-track-piece {
+    background-color: #3b3b3b;
+    -webkit-border-radius: 6px;
+}
+#content::-webkit-scrollbar-thumb:vertical {
+    height: 50px;
+    background-color: #666;
+    border: 1px solid #eee;
+    -webkit-border-radius: 6px;
+}
 #media-queries-container {
     position:relative;
     width:100%;
     height:100%;
 }
-
 #media-queries-ruler {
     position:absolute;
     height:20px;
@@ -55,35 +71,34 @@ header {
     font-size:8px;
     font-weight:100;
 }
-
 .ruler-segment {
     display: inline-block;
     padding-left:2px;
     height:100%;
-    background: url('../images/ruler-high-bar.png') 0% 0% no-repeat, 
-        url('../images/ruler-low-bar.png') 25% 0% no-repeat, 
-        url('../images/ruler-mid-bar.png') 50% 0% no-repeat, 
-        url('../images/ruler-low-bar.png') 75% 0% no-repeat;
+    background: url('../images/ruler-high-bar.png') 0% 0% no-repeat, url('../images/ruler-low-bar.png') 25% 0% no-repeat, url('../images/ruler-mid-bar.png') 50% 0% no-repeat, url('../images/ruler-low-bar.png') 75% 0% no-repeat;
 }
-
 .width-marker {
     position:absolute;
     width:42px;
     height:45px;
     top:30px;
     color:#b7b7b7;
-    background: url('../images/ico-camera.png') 50% 4px no-repeat, url('../images/snapshot.png') 0 0 no-repeat;
+    background: url('../images/snapshot.png') 0 0 no-repeat;
     font-size:8px;
     font-weight:100;
-    padding-top:22px;
+    padding-top:6px;
     text-align:center;
 }
-
 .width-marker:hover {
     color:#fff;
     cursor:pointer;
 }
-
+.width-marker img {
+    opacity:0.8;
+}
+.width-marker:hover img {
+    opacity:1;
+}
 #lst-media-queries-container {
     position:absolute;
     overflow:scroll;
@@ -116,9 +131,8 @@ header {
     height:100%;
     overflow:hidden;
     border-radius: 4px;
-    background: -webkit-linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(0,0,0,0.137255) 100%);
+    background: -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.137255) 100%);
 }
-
 #lst-media-queries > li:hover > .media-query-bar {
     background:url('../images/ico-eye.png') no-repeat 50% 50%;
 }
@@ -132,13 +146,11 @@ header {
     height:100%;
     display:none;
 }
-
 #lst-media-queries > li:hover > .btn-open-css {
     display:block;
     background:url('../images/ico-code.png') no-repeat 50% 50%;
     z-index:10;
 }
-
 #lst-media-queries > li:hover > .btn-open-css {
     cursor: pointer;
 }
@@ -157,35 +169,27 @@ header {
     padding-left:3px;
     text-align:left;
 }
-
-
 #snapshot {
     display:none;
 }
-
 #snapshot.visible {
     position:absolute;
     display:table;
     width:100%;
     height:100%;
     background-color:#3a3f42;
-    z-index:20;    
+    z-index:20;
 }
-
 #snapshot-content {
-
     display:table-cell;
     vertical-align:middle;
     height:100%;
 }
-
 #snapshot-content > div {
     margin: auto;
     text-align:center;
     font-size:14px;
 }
-
-
 #snapshot-content > div > img {
     margin-bottom:15px;
 }

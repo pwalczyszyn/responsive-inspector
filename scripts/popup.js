@@ -356,6 +356,7 @@ App.prototype = {
     },
 
     $widthMarker: null,
+    $widthMarkerLabel: null,
     showWidthMarker: false,
     prevRulerPageX: null,
 
@@ -363,7 +364,8 @@ App.prototype = {
         var that = event.data.that;
 
         if (!that.$widthMarker) {
-            that.$widthMarker = $('<div class="width-marker"></div>');
+            that.$widthMarker = $('<div class="width-marker"><img src="images/ico-camera.png"/><span/></div>');
+            that.$widthMarkerLabel = that.$widthMarker.find('span');
             that.$widthMarker.mouseenter({
                 that: that
             }, that.widthMarker_mouseEnterHandler);
@@ -429,9 +431,9 @@ App.prototype = {
         (snapPoint && (currentValue = snapPoint.at));
 
         // Positioning marker
-        that.$widthMarker.html(currentValue + 'px')
-            // Binding current value with width marker
-            .data('currentValue', currentValue)
+        that.$widthMarkerLabel.html(currentValue + 'px');
+        // Binding current value with width marker
+        that.$widthMarker.data('currentValue', currentValue)
         // ruler left + current position inside the ruler - half of the width of $widthMarker
         .css('left', rulerLeft + Math.round(currentValue / maxValue * $ruler.width()) - (that.$widthMarker.width() / 2));
 
@@ -467,33 +469,17 @@ App.prototype = {
 
         $('#snapshot').toggleClass('visible');
 
-//        chrome.windows.getCurrent(function (currentWindow) {
-//
-//            var restoreWidth = currentWindow.width;
-//
-//            chrome.windows.update(currentWindow.id, {
-//                width: snapshotWidth
-//            }, function () {
+        // Snaphotter complete handler
+        function onSnapshotterComplete(snapshotPath) {
 
-                // Snaphotter complete handler
-                function onSnapshotterComplete(snapshotPath) {
-//                    chrome.windows.update(currentWindow.id, {
-//                        width: restoreWidth
-//                    }, function () {
+            $('#snapshot').toggleClass('visible');
 
-                        $('#snapshot').toggleClass('visible');
+            if (snapshotPath) window.open(snapshotPath);
 
-                        if (snapshotPath) window.open(snapshotPath);
+        }
 
-//                    });
-                }
-
-                // Taking whole page snapshot
-                (new Snapshotter(that.tab, snapshotWidth, onSnapshotterComplete)).execute();
-
-//            });
-//
-//        });
+        // Taking whole page snapshot
+        (new Snapshotter(that.tab, snapshotWidth, onSnapshotterComplete)).execute();
 
     }
 };
