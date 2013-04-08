@@ -20,15 +20,15 @@ Snapshotter.prototype = {
         chrome.tabs.executeScript(that.tab.id, {
             file: "scripts/content_snapshot.js"
         }, function () {
-            that.getPageInfo.call(that);
+//            that.getPageInfo.call(that);
 
-//            chrome.tabs.sendMessage(that.tab.id, {
-//                type: 'loadIFrame'
-//            }, function (response) {
-//
-//                console.log('response');
-//
-//            });
+            chrome.tabs.sendMessage(that.tab.id, {
+                type: 'loadIFrame'
+            }, function (response) {
+
+                console.log('response');
+
+            });
         });
     },
 

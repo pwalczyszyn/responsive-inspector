@@ -28,10 +28,8 @@ if (!window.isSnapshotInitialized) {
         }
 
         function loadIFrame(data, callback) {
-            console.log('loadIFrame');
-
             var req = new XMLHttpRequest();
-            req.open("GET", chrome.extension.getURL('snapshot.html'), true);
+            req.open("GET", chrome.extension.getURL('templates/snapshot.tpl'), true);
             req.onreadystatechange = function () {
                 if (req.readyState == 4 && req.status == 200) {
 
@@ -39,9 +37,9 @@ if (!window.isSnapshotInitialized) {
                     html = html.replace('{{title}}', document.title);
                     html = html.replace('{{width}}', window.innerWidth - 20);
                     html = html.replace('{{src}}', window.location.href);
-                    
+
                     console.log('replacing html', html);
-                    
+
                     document.write(html);
 
                 }

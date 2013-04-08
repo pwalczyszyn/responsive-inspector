@@ -9,7 +9,7 @@
     },
 
     "permissions": ["tabs", "http://*/*", "https://*/*", "file:///*/*"],
-    
+
     "browser_action": {
         "default_title": "Responsive Inspector",
         "default_icon": "images/icon.png",
@@ -17,6 +17,6 @@
     },
 
     "web_accessible_resources": [
-        "snapshot.html", "scripts/libs/run_prettify.js", "scripts/libs/html2canvas.js"
+        "templates/snapshot.tpl", "scripts/libs/run_prettify.js", "scripts/libs/html2canvas.js"
     ]
 }
