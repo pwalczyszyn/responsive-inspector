@@ -2,6 +2,7 @@ var Snapshotter = function (tab, snapshotWidth, onUpdateCallback) {
     this.tab = tab;
     this.snapshotWidth = snapshotWidth;
     this.onUpdateCallback = onUpdateCallback;
+    this.currentY = 0;
 }
 
 Snapshotter.prototype = {
@@ -19,6 +20,8 @@ Snapshotter.prototype = {
     viewHeight: null,
 
     pageHeight: null,
+
+    currentY: null,
 
     canvas: null,
 
@@ -67,7 +70,7 @@ Snapshotter.prototype = {
                     that.pageHeight = response.pageHeight;
 
                     // Starting from top
-                    that.scrollPage.call(that, 0);
+                    that.scrollPage.call(that, that.currentY);
 
                 }
 
@@ -87,7 +90,7 @@ Snapshotter.prototype = {
 
             if (response) {
 
-                console.log('Taking screen shot at:', response.currentY);
+                console.log('Taking screen shot at:', that.currentY);
 
                 chrome.tabs.captureVisibleTab(
                     that.tab.windowId, {
@@ -107,12 +110,17 @@ Snapshotter.prototype = {
                         image.onload = function () {
 
                             // Drawing image on the canvas
-                            that.canvasCtx.drawImage(image, 0, response.currentY);
+                            that.canvasCtx.drawImage(image, 0, that.currentY);
 
                             // Calculating next y position
-                            var nextY = response.currentY + that.viewHeight;
+                            var nextY = that.currentY + that.viewHeight;
+
+                            if (nextY != that.pageHeight && (nextY + that.viewHeight) > that.pageHeight)
+                                nextY = that.pageHeight - that.viewHeight;
 
                             if (nextY < that.pageHeight) {
+
+                                that.currentY = nextY;
 
                                 // Recursive call to scrollPage
                                 that.scrollPage.call(that, nextY, that.tab);
