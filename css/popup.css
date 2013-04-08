@@ -35,27 +35,6 @@ header {
     background-color: #3a3f42;
     height:350px;
     padding:15px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-#content::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-#content::-webkit-scrollbar-button:start:decrement, #content::-webkit-scrollbar-button:end:increment {
-    height: 30px;
-    display: block;
-    background-color: transparent;
-}
-#content::-webkit-scrollbar-track-piece {
-    background-color: #3b3b3b;
-    -webkit-border-radius: 6px;
-}
-#content::-webkit-scrollbar-thumb:vertical {
-    height: 50px;
-    background-color: #666;
-    border: 1px solid #eee;
-    -webkit-border-radius: 6px;
 }
 #media-queries-container {
     position:relative;
@@ -99,6 +78,7 @@ header {
 .width-marker:hover img {
     opacity:1;
 }
+
 #lst-media-queries-container {
     position:absolute;
     overflow:scroll;
@@ -108,6 +88,27 @@ header {
     border-radius: 4px;
     box-shadow: rgb(0, 0, 0) 0px 0px 150px 0px inset;
     padding:1px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#lst-media-queries-container::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+#lst-media-queries-container::-webkit-scrollbar-button:start:decrement, #lst-media-queries-container::-webkit-scrollbar-button:end:increment {
+    display: block;
+    background-color: transparent;
+}
+#lst-media-queries-container::-webkit-scrollbar-track-piece {
+    background-color: #3b3b3b;
+    -webkit-border-radius: 6px;
+}
+#lst-media-queries-container::-webkit-scrollbar-thumb:vertical {
+    height: 50px;
+    background-color: #666;
+    border: none;
+    -webkit-border-radius: 6px;
 }
 #lst-media-queries {
     padding: 0;
