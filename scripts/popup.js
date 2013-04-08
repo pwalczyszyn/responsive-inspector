@@ -467,33 +467,33 @@ App.prototype = {
 
         $('#snapshot').toggleClass('visible');
 
-        chrome.windows.getCurrent(function (currentWindow) {
-
-            var restoreWidth = currentWindow.width;
-
-            chrome.windows.update(currentWindow.id, {
-                width: snapshotWidth
-            }, function () {
+//        chrome.windows.getCurrent(function (currentWindow) {
+//
+//            var restoreWidth = currentWindow.width;
+//
+//            chrome.windows.update(currentWindow.id, {
+//                width: snapshotWidth
+//            }, function () {
 
                 // Snaphotter complete handler
                 function onSnapshotterComplete(snapshotPath) {
-                    chrome.windows.update(currentWindow.id, {
-                        width: restoreWidth
-                    }, function () {
+//                    chrome.windows.update(currentWindow.id, {
+//                        width: restoreWidth
+//                    }, function () {
 
                         $('#snapshot').toggleClass('visible');
 
                         if (snapshotPath) window.open(snapshotPath);
 
-                    });
+//                    });
                 }
 
                 // Taking whole page snapshot
-                (new Snapshotter(that.tab, onSnapshotterComplete)).execute();
+                (new Snapshotter(that.tab, snapshotWidth, onSnapshotterComplete)).execute();
 
-            });
-
-        });
+//            });
+//
+//        });
 
     }
 };

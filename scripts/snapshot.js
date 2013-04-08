@@ -1,13 +1,18 @@
-var Snapshotter = function (tab, onCompleteCallback) {
+var Snapshotter = function (tab, snapshotWidth, onCompleteCallback) {
     this.tab = tab;
+    this.snapshotWidth = snapshotWidth;
     this.onCompleteCallback = onCompleteCallback;
 }
 
 Snapshotter.prototype = {
 
-    viewHeight: null,
+    snapshotWidth: null,
 
-    viewWidth: null,
+    initialWindowWidth: null,
+
+    currentWindow: null,
+
+    viewHeight: null,
 
     pageHeight: null,
 
@@ -17,38 +22,52 @@ Snapshotter.prototype = {
 
     execute: function execute() {
         var that = this;
-        chrome.tabs.executeScript(that.tab.id, {
-            file: "scripts/content_snapshot.js"
-        }, function () {
-//            that.getPageInfo.call(that);
 
-            chrome.tabs.sendMessage(that.tab.id, {
-                type: 'loadIFrame'
-            }, function (response) {
+        chrome.windows.getCurrent(function (currentWindow) {
 
-                console.log('response');
+            that.currentWindow = currentWindow;
+            that.initialWindowWidth = currentWindow.width;
 
-            });
+            if (that.initialWindowWidth < that.snapshotWidth) {
+
+                chrome.windows.update(currentWindow.id, {
+                    width: that.snapshotWidth
+                }, function () {
+                    that.loadContentScript.call(that);
+                });
+
+            } else {
+                that.loadContentScript.call(that);
+            }
+
         });
     },
 
-    getPageInfo: function getPageInfo() {
+    loadContentScript: function loadContentScript() {
         var that = this;
 
-        chrome.tabs.sendMessage(that.tab.id, {
-            type: 'getPageInfo'
-        }, function (response) {
+        chrome.tabs.executeScript(that.tab.id, {
+            file: "scripts/content_snapshot.js"
+        }, function () {
 
-            if (response) {
+            chrome.tabs.sendMessage(that.tab.id, {
+                type: 'loadIFrame',
+                data: {
+                    snapshotWidth: that.snapshotWidth
+                }
+            }, function (response) {
 
-                that.viewHeight = response.viewHeight;
-                that.viewWidth = response.viewWidth;
-                that.pageHeight = response.pageHeight;
+                if (response) {
 
-                // Starting from top
-                that.scrollPage.call(that, 0);
-            }
+                    that.viewHeight = response.viewHeight;
+                    that.pageHeight = response.pageHeight;
 
+                    // Starting from top
+                    that.scrollPage.call(that, 0);
+
+                }
+
+            });
         });
     },
 
@@ -75,7 +94,7 @@ Snapshotter.prototype = {
 
                         if (!that.canvas) {
                             that.canvas = document.createElement('canvas');
-                            that.canvas.width = that.viewWidth;
+                            that.canvas.width = that.snapshotWidth;
                             that.canvas.height = that.pageHeight;
                             that.canvasCtx = that.canvas.getContext('2d');
                         }
@@ -98,8 +117,19 @@ Snapshotter.prototype = {
 
                                 // Cleaning up
                                 chrome.tabs.sendMessage(that.tab.id, {
-                                    type: 'scrollToTop'
-                                }, function (response) {});
+                                    type: 'restore'
+                                }, function (response) {
+
+
+                                    if (that.initialWindowWidth != that.currentWindow.width) {
+                                        chrome.windows.update(that.currentWindow.id, {
+                                            width: that.initialWindowWidth
+                                        }, function () {
+                                            that.loadContentScript.call(that);
+                                        });
+                                    }
+
+                                });
 
                                 // Saving snapshot
                                 that.saveSnapshot.call(that, that.canvas.toDataURL());
@@ -132,7 +162,7 @@ Snapshotter.prototype = {
         }),
 
             // come up with a filename
-            name = 'snapshot-' + that.viewWidth + 'x' + that.pageHeight + '.jpg';
+            name = 'snapshot-' + that.snapshotWidth + 'x' + that.pageHeight + '.jpg';
 
         function onwriteend() {
             // open the file that now contains the blob

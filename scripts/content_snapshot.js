@@ -4,30 +4,13 @@ if (!window.isSnapshotInitialized) {
 
     (function () {
 
-        function getPageInfo(data, callback) {
-            callback({
-                viewHeight: window.innerHeight,
-                viewWidth: window.innerWidth,
-                pageHeight: document.height
-            });
-        }
-
-        function scrollPage(data, callback) {
-            scrollTo(0, data.y);
-
-            setTimeout(function () {
-                callback({
-                    currentY: document.body.scrollTop
-                });
-            }, 1000);
-        }
-
-        function scrollToTop(data, callback) {
-            scrollTo(0, 0);
-            callback(true);
-        }
+        var htmlContent;
 
         function loadIFrame(data, callback) {
+
+            // Storing initial page content
+            htmlContent = document.getElementsByTagName('html')[0].innerHTML
+
             var req = new XMLHttpRequest();
             req.open("GET", chrome.extension.getURL('templates/snapshot.tpl'), true);
             req.onreadystatechange = function () {
@@ -35,16 +18,48 @@ if (!window.isSnapshotInitialized) {
 
                     var html = req.responseText;
                     html = html.replace('{{title}}', document.title);
-                    html = html.replace('{{width}}', window.innerWidth - 20);
+                    html = html.replace('{{width}}', data.snapshotWidth);
                     html = html.replace('{{src}}', window.location.href);
 
-                    console.log('replacing html', html);
-
                     document.write(html);
+
+                    var iframe = document.getElementById('snapshot-iframe');
+                    iframe.onload = function () {
+
+                        callback({
+                            viewHeight: window.innerHeight,
+                            pageHeight: iframe.contentWindow.document.height
+                        });
+
+                    }
 
                 }
             };
             req.send(null);
+        }
+
+        function scrollPage(data, callback) {
+            var iframe = document.getElementById('snapshot-iframe');
+
+            // Scrolling iframe content
+            iframe.contentWindow.scrollTo(0, data.y);
+
+            setTimeout(function () {
+                callback({
+                    currentY: iframe.contentWindow.document.body.scrollTop
+                });
+            }, 500);
+        }
+
+        function restore(data, callback) {
+
+            // Restoring initial content
+            var doc = document.open("text/html", "replace");
+            doc.write(htmlContent);
+            doc.close();
+
+            // Sending callback ater restore
+            callback(true);
         }
 
         chrome.extension.onMessage.addListener(function onMessage(request, sender, callback) {
@@ -52,10 +67,9 @@ if (!window.isSnapshotInitialized) {
             if (request) {
 
                 var fn = {
-                    'getPageInfo': getPageInfo,
+                    'loadIFrame': loadIFrame,
                     'scrollPage': scrollPage,
-                    'scrollToTop': scrollToTop,
-                    'loadIFrame': loadIFrame
+                    'restore': restore
                 }[request.type];
 
                 if (fn) {

@@ -20,7 +20,7 @@
 </head>
 <body>
 
-    <iframe src="{{src}}" scrolling="no" height="100%" width="{{width}}"></iframe>
+    <iframe id="snapshot-iframe" src="{{src}}" scrolling="no" height="100%" width="{{width}}"></iframe>
 
 </body>
 </html>
