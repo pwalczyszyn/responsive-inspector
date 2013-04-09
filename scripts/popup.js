@@ -524,10 +524,29 @@ App.prototype = {
     },
 
     btnSave_clickHandler: function btnShare_clickHandler(event) {
-        var a = document.createElement('a');
-        a.href = event.data.path;
-        a.download = 'snapshot.jpg'; // Filename
-        a.click();
+
+        var that = event.data.that;
+
+        chrome.tabs.sendMessage(that.tab.id, {
+            'type': 'popupSaveDialog',
+            data: {
+                path: event.data.path
+            }
+        }, function (response) {
+            console.log('Save should popup!');
+        });
+
+        //        var a = document.createElement('a');
+        //        a.href = event.data.path;
+        //        a.download = 'snapshot.jpg'; // Filename
+        //        a.target = '_blank';
+        //        a.click();
+        //
+
+        //        var uriContent = "data:application/octet-stream;filename=snapshot.jpg," + event.data.path;
+        //        var newWindow = window.open(uriContent, 'snapshot.jpg');
+
+        //        window.open(chrome.extension.getURL('snapshot-download.html'));
     },
 
     btnShare_clickHandler: function btnShare_clickHandler(event) {

@@ -39,13 +39,17 @@ if (!window.isResponsiveInspectorInitialized) {
 
             }
 
-            //            // Send results back to popup
-            //            chrome.extension.sendMessage({
-            //                type: 'media',
-            //                data: media
-            //            });
-
             callback(media);
+        }
+
+        function popupSaveDialog(data) {
+
+            var a = document.createElement('a');
+            a.href = data.path;
+            a.download = 'snapshot.jpg'; // Filename
+            a.target = '_blank';
+            a.click();
+
         }
 
         chrome.extension.onMessage.addListener(function (message, sender, callback) {
@@ -54,6 +58,10 @@ if (!window.isResponsiveInspectorInitialized) {
                 case 'getMedia':
                     getMedia(callback);
                     break;
+                case 'popupSaveDialog':
+                    popupSaveDialog(message.data, callback);
+                    break;
+
             }
 
         });
