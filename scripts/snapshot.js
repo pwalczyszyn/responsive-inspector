@@ -176,6 +176,7 @@ Snapshotter.prototype = {
             // open the file that now contains the blob
             that.onUpdateCallback({
                 status: 'complete',
+                blob: blob,
                 path: 'filesystem:chrome-extension://' + chrome.i18n.getMessage("@@extension_id") + '/temporary/' + name
             });
         }

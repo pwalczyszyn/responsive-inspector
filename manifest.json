@@ -8,12 +8,19 @@
         "128": "images/icon.png"
     },
 
-    //    "background": {
-    //        "scripts": ["scripts/background.js"],
-    //        "persistent": false
-    //    },
+    "background": {
+        "scripts": ["scripts/background.js"],
+        "persistent": false
+    },
 
-    "permissions": ["tabs", "http://*/*", "https://*/*", "file:///*/*"],
+    "permissions": [
+        "tabs",
+        "http://*/*",
+        "https://*/*",
+        "file:///*/*",
+        "https://www.behance.net/v2/oauth/authenticate",
+        "https://www.behance.net/v2/oauth/token"
+    ],
 
     "browser_action": {
         "default_title": "Responsive Inspector",

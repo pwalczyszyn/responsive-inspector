@@ -56,6 +56,10 @@ ResponsiveInspectorPopup.prototype = {
         $('#btn-discard').click({
             that: this
         }, this.btnDiscard_clickHandler);
+
+        $('#oauth-iframe').on('load', {
+            that: this
+        }, this.oauth_loadHandler);
     },
 
     zoomLevel: 100,
@@ -549,6 +553,7 @@ ResponsiveInspectorPopup.prototype = {
 
             if (updateInfo.status == 'complete') {
 
+                that.blob = updateInfo.blob;
                 that.showSnapshotPreview.call(that, updateInfo.path);
 
             } else if (updateInfo.status == 'error') {
@@ -591,13 +596,65 @@ ResponsiveInspectorPopup.prototype = {
     },
 
     btnShare_clickHandler: function btnShare_clickHandler(event) {
-        alert('Coming soon!');
+        var that = event.data.that;
+
+        $('body').attr('data-state', 'share');
+
+        var accessToken = localStorage.getItem('access_token');
+
+        if (accessToken) {
+            //
+            var req = new XMLHttpRequest();
+            req.open('POST', 'https://www.behance.net/v2/wips?access_token=' + accessToken, true);
+            req.onreadystatechange = function () {
+
+                console.log('onreadystatechange, responseText', this.responseText);
+
+                if (req.readyState == 4 && req.status == 200) {
+
+                }
+            }
+
+            var data = new FormData();
+            data.append('access_token', accessToken);
+            data.append('title', 'my wip');
+            data.append('description', 'my description');
+            data.append('tags', 'rwd');
+            data.append('image', that.blob, 'snapshot.jpg');
+
+            //            "{"http_code":400,"valid":0,"messages":[{"type":"error","message":"Invalid file type, extensions acceptable: jpg, gif, png, jpeg"}],"code":-5022}"
+
+            req.send(data);
+
+        } else {
+
+            chrome.runtime.getBackgroundPage(function (bp) {
+                bp.loginToBehance();
+            });
+        }
+
+
+        //        $('#oauth-iframe').attr('src', 'https://www.behance.net/v2/oauth/authenticate?client_id=qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL&redirect_uri=http%3A%2F%2Foutof.me&scope=wip_write&state=state');
+
+        //        chrome.windows.create({
+        //            url: 'https://www.behance.net/v2/oauth/authenticate?client_id=qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL&redirect_uri=http%3A%2F%2Foutof.me&scope=wip_write&state=state'
+        //        }, function (newWindow) {
+        //
+        //            console.log('New window created!');
+        //
+        //        });
     },
 
     btnDiscard_clickHandler: function btnDiscard_clickHandler(event) {
         $('body').attr('data-state', 'media-queries');
     },
 
+    oauth_loadHandler: function oauth_loadHandler(event) {
+        var $oauthIFrame = $(this);
+
+        console.log('location:', this.contentWindow.location);
+
+    }
 
 };
 
