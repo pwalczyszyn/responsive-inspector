@@ -1,5 +1,5 @@
-var App = function () {};
-App.prototype = {
+var ResponsiveInspectorPopup = function () {};
+ResponsiveInspectorPopup.prototype = {
 
     tab: null,
 
@@ -38,23 +38,69 @@ App.prototype = {
             });
         });
 
+        // Registering media queries view buttons handlers
+        $('#btn-zoom-in').click({
+            that: this
+        }, this.btnZoomIn_clickHandler);
+        $('#btn-zoom-out').click({
+            that: this
+        }, this.btnZoomOut_clickHandler);
 
+        // Registering preview buttons handlers
+        $('#btn-save').click({
+            that: this
+        }, this.btnSave_clickHandler);
+        $('#btn-share').click({
+            that: this
+        }, this.btnShare_clickHandler);
+        $('#btn-discard').click({
+            that: this
+        }, this.btnDiscard_clickHandler);
+    },
 
+    zoomLevel: 100,
+
+    btnZoomIn_clickHandler: function btnZoomIn_clickHandler(event) {
+        var that = event.data.that;
+        that.zoomLevel += 10;
+        $('#media-queries-ruler, #lst-media-queries-container').css('width', that.zoomLevel + '%');
+    },
+
+    btnZoomOut_clickHandler: function btnZoomOut_clickHandler(event) {
+        var that = event.data.that;
+        if (that.zoomLevel > 100) {
+            that.zoomLevel -= 10;
+            $('#media-queries-ruler, #lst-media-queries-container').css('width', that.zoomLevel + '%');
+        }
     },
 
     styleSheetOpen_clickHandler: function (event) {
-
         var mq = $(this).parent().data('mq');
 
+        // Creating new tab
         chrome.tabs.create({
             url: mq.url,
-            active: true
+            active: false
         }, function (t) {
-            console.log('opened');
 
             // Executing content script
             chrome.tabs.executeScript(t.id, {
-                file: "scripts/content_style.js"
+                file: "scripts/libs/prettify.js"
+            }, function () {
+
+                // Loading content_style.js
+                chrome.tabs.executeScript(t.id, {
+                    file: "scripts/content_style.js"
+                }, function () {
+
+                    // Sending message to pretty print and to find mediaText
+                    chrome.tabs.sendMessage(t.id, {
+                        type: 'prettyPrint',
+                        data: mq.mediaText
+                    });
+
+                });
+
             });
 
         });
@@ -62,7 +108,8 @@ App.prototype = {
     },
 
     mediaQueryBar_clickHandler: function (event) {
-        var mq = $(this).parent().data('mq');
+        var that = event.data.that,
+            mq = $(this).parent().data('mq');
 
         chrome.windows.getCurrent(function (currentWindow) {
 
@@ -79,6 +126,13 @@ App.prototype = {
 
             chrome.windows.update(currentWindow.id, {
                 width: width
+            }, function () {
+
+                chrome.tabs.sendMessage(that.tab.id, {
+                    'type': 'showResolution',
+                    'width': width
+                });
+
             });
         });
 
@@ -270,7 +324,7 @@ App.prototype = {
         }
 
         // Adding 16% to maxValue
-        maxValue = Math.max(Math.round(maxValue * 1.16), screen.width);
+        maxValue = Math.max(Math.round(maxValue * 1.16), (screen.width * 1.05));
 
         // Drawing ruler
         this.drawRuler(maxValue);
@@ -327,7 +381,9 @@ App.prototype = {
 
         // Appending items and registering click event
         $('#lst-media-queries').append(items)
-            .on('click', '.media-query-bar', this.mediaQueryBar_clickHandler)
+            .on('click', '.media-query-bar', {
+            that: this
+        }, this.mediaQueryBar_clickHandler)
             .on('click', '.btn-open-css', this.styleSheetOpen_clickHandler);
 
     },
@@ -359,6 +415,7 @@ App.prototype = {
 
     $widthMarker: null,
     $widthMarkerLabel: null,
+    $widthMarkerLine: null,
     showWidthMarker: false,
     prevRulerPageX: null,
 
@@ -368,6 +425,8 @@ App.prototype = {
         if (!that.$widthMarker) {
             that.$widthMarker = $('<div class="width-marker"><img src="images/ico-camera.png"/><span/></div>');
             that.$widthMarkerLabel = that.$widthMarker.find('span');
+            that.$widthMarkerLine = $('<div class="width-marker-line"/>');
+
             that.$widthMarker.mouseenter({
                 that: that
             }, that.widthMarker_mouseEnterHandler);
@@ -380,6 +439,9 @@ App.prototype = {
         }
         that.showWidthMarker = true;
         that.$widthMarker.css('left', event.pageX - (that.$widthMarker.width() / 2)).appendTo(document.body).fadeIn('fast');
+
+        var $mediaQueriesContainer = $('#media-queries-container');
+        that.$widthMarkerLine.css('left', (event.pageX - $mediaQueriesContainer.offset().left)).appendTo($mediaQueriesContainer);
 
         // Setting initial page x
         that.prevRulerPageX = event.pageX;
@@ -439,6 +501,9 @@ App.prototype = {
         // ruler left + current position inside the ruler - half of the width of $widthMarker
         .css('left', rulerLeft + Math.round(currentValue / maxValue * $ruler.width()) - (that.$widthMarker.width() / 2));
 
+        var $mediaQueriesContainer = $('#media-queries-container');
+        that.$widthMarkerLine.css('left', Math.round(currentValue / maxValue * $ruler.width()));
+
         // Setting previous ruler page x
         that.prevRulerPageX = event.pageX;
     },
@@ -456,11 +521,13 @@ App.prototype = {
     hideWidthMarker: function hideWidthMarker(that) {
         that.showWidthMarker = false;
         setTimeout(function () {
-            if (!that.showWidthMarker)
-                that.$widthMarker.fadeOut('fast', function () {
+            if (!that.showWidthMarker) {
+                that.$widthMarker.fadeOut(50, function () {
+                    that.$widthMarkerLine.detach();
                     that.$widthMarker.detach();
                 });
-        }, 200);
+            }
+        }, 150);
     },
 
     widthMarker_clickHandler: function widthMarker_clickHandler(event) {
@@ -495,58 +562,29 @@ App.prototype = {
 
     },
 
+    snapshotPath: null,
+
     showSnapshotPreview: function showSnapshotPreview(path) {
         var $preview = $('#preview');
 
+        // Setting path to snapshot
+        this.snapshotPath = path;
+
         // Set img src
-        $preview.html('<img src="' + path + '"/>');
+        $preview.html('<img src="' + this.snapshotPath + '"/>');
 
         // Show preview view
         $('body').attr('data-state', 'preview');
-
-        // Registering preview buttons handlers
-        if (!this.previewInitialized) {
-            this.previewInitialized = true;
-            $('#btn-save').click({
-                that: this,
-                path: path
-            }, this.btnSave_clickHandler);
-            $('#btn-share').click({
-                that: this,
-                path: path
-            }, this.btnShare_clickHandler);
-            $('#btn-discard').click({
-                that: this,
-                path: path
-            }, this.btnDiscard_clickHandler);
-        }
-
     },
 
     btnSave_clickHandler: function btnShare_clickHandler(event) {
-
         var that = event.data.that;
-
         chrome.tabs.sendMessage(that.tab.id, {
             'type': 'popupSaveDialog',
             data: {
-                path: event.data.path
+                path: that.snapshotPath
             }
-        }, function (response) {
-            console.log('Save should popup!');
         });
-
-        //        var a = document.createElement('a');
-        //        a.href = event.data.path;
-        //        a.download = 'snapshot.jpg'; // Filename
-        //        a.target = '_blank';
-        //        a.click();
-        //
-
-        //        var uriContent = "data:application/octet-stream;filename=snapshot.jpg," + event.data.path;
-        //        var newWindow = window.open(uriContent, 'snapshot.jpg');
-
-        //        window.open(chrome.extension.getURL('snapshot-download.html'));
     },
 
     btnShare_clickHandler: function btnShare_clickHandler(event) {
@@ -559,4 +597,7 @@ App.prototype = {
 
 
 };
-(new App).execute();
+
+window.onload = function () {
+    (new ResponsiveInspectorPopup).execute();
+}
