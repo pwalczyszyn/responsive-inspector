@@ -392,9 +392,10 @@ ResponsiveInspectorPopup.prototype = {
         var $ruler = $('#media-queries-ruler'),
             SEGMENT_PX = 250,
             segmentWidth = SEGMENT_PX / maxValue * 100,
+            segmentsCount = Math.ceil(maxValue / SEGMENT_PX),
             segments = [];
 
-        for (var i = 0; i < Math.ceil(maxValue / SEGMENT_PX); i++) {
+        for (var i = 0; i < segmentsCount; i++) {
             segments.push('<div class="ruler-segment" style="width:' + segmentWidth + '%' + '">' + (i * SEGMENT_PX) + 'px</div>');
         }
 
