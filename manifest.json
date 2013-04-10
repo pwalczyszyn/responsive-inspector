@@ -8,6 +8,11 @@
         "128": "images/icon.png"
     },
 
+    //    "background": {
+    //        "scripts": ["scripts/background.js"],
+    //        "persistent": false
+    //    },
+
     "permissions": ["tabs", "http://*/*", "https://*/*", "file:///*/*"],
 
     "browser_action": {

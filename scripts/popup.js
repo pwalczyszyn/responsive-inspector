@@ -503,6 +503,8 @@ ResponsiveInspectorPopup.prototype = {
 
         var $mediaQueriesContainer = $('#media-queries-container');
         that.$widthMarkerLine.css('left', Math.round(currentValue / maxValue * $ruler.width()));
+        if (snapPoint) that.$widthMarkerLine.addClass('snapped');
+        else that.$widthMarkerLine.removeClass('snapped');
 
         // Setting previous ruler page x
         that.prevRulerPageX = event.pageX;

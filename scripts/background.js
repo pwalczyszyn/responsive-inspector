@@ -1,9 +1,7 @@
-console.log('bg script init');
-
-chrome.extension.onConnect.addListener(function (port) {
-    port.onMessage.addListener(function (message) {
-        
-        console.log('bg received message');
-        
-    });
-});
+var popupSaveDialog = function popupSaveDialog(data) {
+    var a = document.createElement('a');
+    a.href = data.path;
+    a.download = 'snapshot.jpg'; // Filename
+    a.target = '_blank';
+    a.click();
+}

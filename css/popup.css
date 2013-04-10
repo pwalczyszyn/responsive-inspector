@@ -115,6 +115,9 @@ body[data-state="media-queries"] #media-queries-buttons {
     bottom:0;
     background-color:#aaa;
 }
+.width-marker-line.snapped {
+    background-color:#FFE303;
+}
 #lst-media-queries-container {
     position:absolute;
     top:20px;
