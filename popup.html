@@ -45,12 +45,40 @@
                 <div id="progress-content">
                     <div>
                         <img src="images/ajax-loader.gif" />
-                        <br/>Stitching snapshots...</div>
+                        <br/>
+                        <span />
+                    </div>
                 </div>
             </div>
             <div id="preview"></div>
-            <div id="share">
-                
+            <div id="share" data-state="authorize">
+                <div id="authorize-info">
+                    <img src="images/behance-icon.png" />
+                    <br/>
+                    <button type="button">Authorize</button>
+                </div>
+                <div id="wip">
+                    <div id="wip-preview">
+                        <img/>
+                    </div>
+                    <div id="wip-info">
+                        <label for="lst-wips">Existing WIPs</label>
+                        <select id="lst-wips">
+                        </select>
+                        <label for="wip-title">Title</label>
+                        <input type="text" name="wip-title" id="wip-title" required>
+                        <label for="wip-description">Description</label>
+                        <textarea name="wip-description" id="wip-description" required></textarea>
+                        <label for="wip-tags">Tags (, comma separated)</label>
+                        <input type="text" name="wip-tags" id="wip-tags" required>
+                        <label for="wip-privacy">Privacy</label>
+                        <select id="wip-privacy">
+                            <option value="public">Public</option>
+                            <option value="feedback_circle">Feedback circle</option>
+                        </select>
+                        <input type="button" id="btn-wip-share" value="Share" />
+                    </div>
+                </div>
             </div>
         </div>
     </body>

@@ -3,13 +3,14 @@ var loginToBehance = function loginToBehance() {
     chrome.tabs.create({
         url: 'https://www.behance.net/v2/oauth/authenticate?client_id=qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL&redirect_uri=http%3A%2F%2Foutof.me&scope=wip_write&state=state'
     }, function (tab) {
-        console.log('tab opened');
 
-        chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, updatedTab) {
+        chrome.tabs.onUpdated.addListener(function behanceOAuthTab(tabId, changeInfo, updatedTab) {
 
+            // TODO add error handling
             if (tabId == tab.id && changeInfo.status == 'complete' && updatedTab.url && updatedTab.url.indexOf('?code=') != -1) {
 
-                // TODO: remove listener
+                // We don't need to listen anymore
+                chrome.tabs.onUpdated.removeListener(behanceOAuthTab);
 
                 var split = updatedTab.url.split('?')[1].split('&'),
                     props = {};
@@ -23,14 +24,10 @@ var loginToBehance = function loginToBehance() {
                 req.open('POST', 'https://www.behance.net/v2/oauth/token', true);
                 req.onreadystatechange = function () {
                     if (req.readyState == 4 && req.status == 200) {
-
-                        var result = JSON.parse(req.responseText);
-                        alert(result.access_token);
-
-                        localStorage.setItem('access_token', result.access_token);
-
-                        //                        JSON.
+                        localStorage.setItem('behance_user_info', req.responseText);
                     }
+
+                    // TODO add error handling
                 }
 
                 var data = new FormData();
@@ -41,15 +38,6 @@ var loginToBehance = function loginToBehance() {
                 data.append('grant_type', 'authorization_code');
 
                 req.send(data);
-
-                //                req.send({
-                //                    client_id: 'qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL',
-                //                    client_secret: 'u8XcFRkv8ExgTd_QSFhcS76tJCL1v9Nw',
-                //                    code: props.code,
-                //                    redirect_uri: 'http://outof.me',
-                //                    grant_type: 'authorization_code'
-                //                });
-
             }
 
         });

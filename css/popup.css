@@ -44,6 +44,7 @@ header {
     width:100%;
     height:100%;
     border-radius:2px;
+    overflow-x:auto;
 }
 body[data-state="media-queries"] #media-queries-container {
     display:block;
@@ -316,6 +317,72 @@ body[data-state="preview"] #preview-buttons {
 }
 body[data-state="share"] #share {
     display:block;
+}
+#share[data-state="authorize"] #authorize-info {
+    display:block;
+}
+#authorize-info {
+    display:none;
+    text-align:center;
+    padding-top:100px;
+}
+#authorize-info img {
+    width:100px;
+}
+#share[data-state="wip"] #wip {
+    display:block;
+}
+#wip {
+    display:none;
+}
+#wip-preview {
+    float:left;
+    width:40%;
+    height:100%;
+    padding:5px;
+    text-align:center;
+}
+#wip-preview img {
+    max-width:95%;
+    max-height:95%;
+}
+#wip-info {
+    float:right;
+    width:60%;
+    height:100%;
+    padding:5px;
+}
+#wip-info * {
+    display:block;
+    padding:3px;
+    margin-bottom:4px;
+}
+#wip-info input, #wip-info textarea {
+    width:90%;
+}
+#wip-info textarea {
+    height:60px;
+}
+input:required:invalid, input:focus:invalid {
+    border: 1px solid #ff0000;
+}
+.alert {
+    position:absolute;
+    z-index:1000;
+    background-color:#00ff00;
+    line-height:25px;
+    text-align:center;
+    width:70%;
+    left:15%;
+    top:200px;
+    padding:5px;
+    overflow:hidden;
+    border-radius:5px;
+    color:#fff;
+    display:none;
+}
+.alert.error {
+    background-color:#ff0000;
 }
 @-webkit-keyframes blink {
     0% {

@@ -544,7 +544,7 @@ ResponsiveInspectorPopup.prototype = {
         that.hideWidthMarker(that);
 
         // Showing snapshot view
-        $('body').attr('data-state', 'progress');
+        that.showProgressView('Stitching snapshots...');
 
         /** 
          * Snaphotter complete handler
@@ -598,51 +598,104 @@ ResponsiveInspectorPopup.prototype = {
     btnShare_clickHandler: function btnShare_clickHandler(event) {
         var that = event.data.that;
 
-        $('body').attr('data-state', 'share');
+        var userInfo = JSON.parse(localStorage.getItem('behance_user_info'));
 
-        var accessToken = localStorage.getItem('access_token');
+        if (userInfo) {
 
-        if (accessToken) {
-            //
-            var req = new XMLHttpRequest();
-            req.open('POST', 'https://www.behance.net/v2/wips?access_token=' + accessToken, true);
-            req.onreadystatechange = function () {
+            that.showProgressView('Getting user WIPs...');
 
-                console.log('onreadystatechange, responseText', this.responseText);
+            $.ajax({
+                type: 'GET',
+                url: 'http://www.behance.net/v2/users/' + userInfo.user.username + '/wips',
+                data: {
+                    api_key: 'qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL'
+                },
+                success: function (data, textStatus, jqXHR) {
+                    // Making sure authorize is a state of share view
+                    $('#share').attr('data-state', 'wip');
+                    // Switching to share view
+                    $('body').attr('data-state', 'share');
 
-                if (req.readyState == 4 && req.status == 200) {
+                    // Display preview
+                    $('#wip-preview').html('<img src="' + that.snapshotPath + '"/>');
 
+                    var wips = ['<option value="">New...</option>'];
+                    for (var i in data.wips) {
+                        var wip = data.wips[i];
+                        wips.push('<option value="' + wip.id + '">' + wip.title + '</option>');
+                    }
+
+                    var $lstWIPs = $('#lst-wips').html(wips);
+                    $lstWIPs.off('change').on('change', function () {
+                        var $option = $lstWIPs.find('option:selected');
+                        if ($option.val() == '') {
+                            $('#wip-title').val('').removeAttr('disabled');
+                        } else {
+                            $('#wip-title').val($option.text()).attr('disabled', true);
+                        }
+                    });
+
+                    var $btnWIPShare = $('#btn-wip-share').off('click').on('click', function () {
+
+                        if ($('#wip-info :invalid').length == 0) {
+
+                            var wipId = $lstWIPs.val(),
+                                isNew = (wipId == ''),
+                                url = 'https://www.behance.net/v2/wips' + (isNew ? '' : '/' + wipId) + '?access_token=' + userInfo.access_token,
+                                data = new FormData();
+
+                            data.append('access_token', userInfo.access_token);
+                            data.append('title', $('#wip-title').val());
+                            data.append('description', $('#wip-description').val());
+                            data.append('tags', $('#wip-tags').val().replace(/ /g, '').replace(/,/g, '|'));
+                            data.append('image', that.blob, 'snapshot.jpg');
+                            data.append('privacy', $('#wip-privacy').val());
+
+                            // Showing progress view
+                            that.showProgressView(isNew ? 'Creating new WIP...' : 'Adding revision of existing WIP...');
+
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                processData: false,
+                                contentType: false,
+                                data: data,
+                                success: function (data, textStatus, jqXHR) {
+                                    that.showAlert('success', 'WIP saved successfully!');
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    that.showAlert('error', 'Error saving WIP!');
+                                },
+                                complete: function () {
+                                    $('body').attr('data-state', 'preview');
+                                }
+                            });
+
+                        }
+                    });
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('error getting user wips', textStatus);
+                    alert('Something went wrong while getting user info: ' + errorThrown);
                 }
-            }
+            });
 
-            var data = new FormData();
-            data.append('access_token', accessToken);
-            data.append('title', 'my wip');
-            data.append('description', 'my description');
-            data.append('tags', 'rwd');
-            data.append('image', that.blob, 'snapshot.jpg');
-
-            //            "{"http_code":400,"valid":0,"messages":[{"type":"error","message":"Invalid file type, extensions acceptable: jpg, gif, png, jpeg"}],"code":-5022}"
-
-            req.send(data);
 
         } else {
 
-            chrome.runtime.getBackgroundPage(function (bp) {
-                bp.loginToBehance();
+            // Making sure authorize is a state of share view
+            $('#share').attr('data-state', 'authorize');
+            // Switching to share view
+            $('body').attr('data-state', 'share');
+            // Registering click handler
+            $('#authorize-info button').click(function () {
+                chrome.runtime.getBackgroundPage(function (bp) {
+                    bp.loginToBehance();
+                });
             });
+
         }
-
-
-        //        $('#oauth-iframe').attr('src', 'https://www.behance.net/v2/oauth/authenticate?client_id=qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL&redirect_uri=http%3A%2F%2Foutof.me&scope=wip_write&state=state');
-
-        //        chrome.windows.create({
-        //            url: 'https://www.behance.net/v2/oauth/authenticate?client_id=qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL&redirect_uri=http%3A%2F%2Foutof.me&scope=wip_write&state=state'
-        //        }, function (newWindow) {
-        //
-        //            console.log('New window created!');
-        //
-        //        });
     },
 
     btnDiscard_clickHandler: function btnDiscard_clickHandler(event) {
@@ -654,6 +707,20 @@ ResponsiveInspectorPopup.prototype = {
 
         console.log('location:', this.contentWindow.location);
 
+    },
+
+    showAlert: function showAlert(type, message) {
+
+        $('<div class="alert ' + type + '"/>').html(message)
+            .appendTo(document.body).delay(1).fadeIn('slow')
+            .delay(2000).fadeOut('slow', function () {
+            $(this).remove();
+        });
+    },
+
+    showProgressView: function showProgressView(message) {
+        $('#progress-content span').html(message);
+        $('body').attr('data-state', 'progress');
     }
 
 };
