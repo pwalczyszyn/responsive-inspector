@@ -45,6 +45,7 @@ header {
     height:100%;
     border-radius:2px;
     overflow-x:auto;
+    overflow-y:hidden;
 }
 body[data-state="media-queries"] #media-queries-container {
     display:block;
@@ -134,21 +135,21 @@ body[data-state="media-queries"] #media-queries-buttons {
     overflow-y: auto;
     overflow-x: hidden;
 }
-#lst-media-queries-container::-webkit-scrollbar {
-    z-index: 999;
+::-webkit-scrollbar {
     width: 5px;
+    height: 5px;
     background: -webkit-linear-gradient(top, #1d1d1d 1%, #323232 50%, #1d1d1d 99%);
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3);
 }
-#lst-media-queries-container::-webkit-scrollbar-button:start:decrement, #lst-media-queries-container::-webkit-scrollbar-button:end:increment {
+::-webkit-scrollbar-button:start:decrement, ::-webkit-scrollbar-button:end:increment {
     display: none;
     background-color: transparent;
 }
-#lst-media-queries-container::-webkit-scrollbar-track-piece {
+::-webkit-scrollbar-track-piece {
     background: -webkit-linear-gradient(top, #1d1d1d 1%, #323232 50%, #1d1d1d 99%);
     -webkit-border-radius:0px;
 }
-#lst-media-queries-container::-webkit-scrollbar-thumb:vertical {
+::-webkit-scrollbar-thumb:vertical {
     height: 50px;
     background-color: rgba(255, 255, 255, 0.8);
     opacity: 1;

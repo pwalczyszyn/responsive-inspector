@@ -306,9 +306,6 @@ ResponsiveInspectorPopup.prototype = {
         // Adding 16% to maxValue
         maxValue = Math.max(Math.round(maxValue * 1.16), (screen.width * 1.05));
 
-        // Drawing ruler
-        this.drawRuler(maxValue);
-
         var topColors = chroma.color('#eda221'),
             midColors = chroma.color('#00FF00'),
             bottomColors = chroma.color('#0000FF');
@@ -366,6 +363,9 @@ ResponsiveInspectorPopup.prototype = {
         }, this.mediaQueryBar_clickHandler)
             .on('click', '.btn-open-css', this.styleSheetOpen_clickHandler);
 
+        // Drawing ruler
+        this.drawRuler(maxValue);
+
     },
 
     drawRuler: function drawRuler(maxValue) {
@@ -379,7 +379,7 @@ ResponsiveInspectorPopup.prototype = {
             segments.push('<div class="ruler-segment" style="width:' + segmentWidth + '%' + '">' + (i * SEGMENT_PX) + 'px</div>');
         }
 
-        $ruler.html(segments);
+        $ruler.html(segments).css('padding-right', ($ruler.width() - $('#lst-media-queries').width()) + 'px');
 
         $ruler.mouseenter({
             that: this
