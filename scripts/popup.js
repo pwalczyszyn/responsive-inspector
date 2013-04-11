@@ -81,32 +81,8 @@ ResponsiveInspectorPopup.prototype = {
     styleSheetOpen_clickHandler: function (event) {
         var mq = $(this).parent().data('mq');
 
-        // Creating new tab
-        chrome.tabs.create({
-            url: mq.url,
-            active: false
-        }, function (t) {
-
-            // Executing content script
-            chrome.tabs.executeScript(t.id, {
-                file: "scripts/libs/prettify.js"
-            }, function () {
-
-                // Loading content_style.js
-                chrome.tabs.executeScript(t.id, {
-                    file: "scripts/content_style.js"
-                }, function () {
-
-                    // Sending message to pretty print and to find mediaText
-                    chrome.tabs.sendMessage(t.id, {
-                        type: 'prettyPrint',
-                        data: mq.mediaText
-                    });
-
-                });
-
-            });
-
+        chrome.runtime.getBackgroundPage(function (bp) {
+            bp.openStyleSheet(mq);
         });
 
     },
