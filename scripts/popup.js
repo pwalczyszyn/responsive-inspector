@@ -56,10 +56,6 @@ ResponsiveInspectorPopup.prototype = {
         $('#btn-discard').click({
             that: this
         }, this.btnDiscard_clickHandler);
-
-        $('#oauth-iframe').on('load', {
-            that: this
-        }, this.oauth_loadHandler);
     },
 
     zoomLevel: 100,
@@ -404,7 +400,7 @@ ResponsiveInspectorPopup.prototype = {
         var that = event.data.that;
 
         if (!that.$widthMarker) {
-            that.$widthMarker = $('<div class="width-marker"><img src="images/ico-camera.png"/><span/></div>');
+            that.$widthMarker = $('<div class="width-marker"><span/><div><img id="btn-resize" src="images/ico-resize.png"/><img id="btn-snapshot" src="images/ico-camera.png"/></div></div>');
             that.$widthMarkerLabel = that.$widthMarker.find('span');
             that.$widthMarkerLine = $('<div class="width-marker-line"/>');
 
@@ -414,9 +410,12 @@ ResponsiveInspectorPopup.prototype = {
             that.$widthMarker.mouseleave({
                 that: that
             }, that.widthMarker_mouseLeaveHandler);
-            that.$widthMarker.click({
+            that.$widthMarker.find('#btn-resize').click({
                 that: that
-            }, that.widthMarker_clickHandler);
+            }, that.btnResize_clickHandler);
+            that.$widthMarker.find('#btn-snapshot').click({
+                that: that
+            }, that.btnSnapshot_clickHandler);
         }
         that.showWidthMarker = true;
         that.$widthMarker.css('left', event.pageX - (that.$widthMarker.width() / 2)).appendTo(document.body).fadeIn('fast');
@@ -482,10 +481,17 @@ ResponsiveInspectorPopup.prototype = {
         // ruler left + current position inside the ruler - half of the width of $widthMarker
         .css('left', rulerLeft + Math.round(currentValue / maxValue * $ruler.width()) - (that.$widthMarker.width() / 2));
 
-        var $mediaQueriesContainer = $('#media-queries-container');
+        // Positioning marker line
         that.$widthMarkerLine.css('left', Math.round(currentValue / maxValue * $ruler.width()));
-        if (snapPoint) that.$widthMarkerLine.addClass('snapped');
-        else that.$widthMarkerLine.removeClass('snapped');
+
+        // Applying snap colors
+        if (snapPoint) {
+            that.$widthMarker.addClass('snapped');
+            that.$widthMarkerLine.addClass('snapped');
+        } else {
+            that.$widthMarker.removeClass('snapped');
+            that.$widthMarkerLine.removeClass('snapped');
+        }
 
         // Setting previous ruler page x
         that.prevRulerPageX = event.pageX;
@@ -513,9 +519,27 @@ ResponsiveInspectorPopup.prototype = {
         }, 150);
     },
 
-    widthMarker_clickHandler: function widthMarker_clickHandler(event) {
+    btnResize_clickHandler: function btnResize_clickHandler(event) {
         var that = event.data.that,
-            snapshotWidth = $(this).data('currentValue');
+            resizeWidth = that.$widthMarker.data('currentValue');
+
+        chrome.windows.getCurrent(function (currentWindow) {
+            chrome.windows.update(currentWindow.id, {
+                width: resizeWidth
+            }, function () {
+
+                chrome.tabs.sendMessage(that.tab.id, {
+                    'type': 'showResolution',
+                    'width': resizeWidth
+                });
+
+            });
+        });
+    },
+
+    btnSnapshot_clickHandler: function btnSnapshot_clickHandler(event) {
+        var that = event.data.that,
+            snapshotWidth = that.$widthMarker.data('currentValue');
 
         that.hideWidthMarker(that);
 
@@ -587,10 +611,8 @@ ResponsiveInspectorPopup.prototype = {
                     api_key: 'qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL'
                 },
                 success: function (data, textStatus, jqXHR) {
-                    // Making sure authorize is a state of share view
-                    $('#share').attr('data-state', 'wip');
                     // Switching to share view
-                    $('body').attr('data-state', 'share');
+                    $('body').attr('data-state', 'publish');
 
                     // Display preview
                     $('#wip-preview').html('<img src="' + that.snapshotPath + '"/>');
@@ -611,7 +633,7 @@ ResponsiveInspectorPopup.prototype = {
                         }
                     });
 
-                    var $btnWIPShare = $('#btn-wip-share').off('click').on('click', function () {
+                    var $btnWIPShare = $('#btn-publish').off('click').on('click', function () {
 
                         if ($('#wip-info :invalid').length == 0) {
 
@@ -660,10 +682,8 @@ ResponsiveInspectorPopup.prototype = {
 
         } else {
 
-            // Making sure authorize is a state of share view
-            $('#share').attr('data-state', 'authorize');
             // Switching to share view
-            $('body').attr('data-state', 'share');
+            $('body').attr('data-state', 'authorize');
             // Registering click handler
             $('#authorize-info button').click(function () {
                 chrome.runtime.getBackgroundPage(function (bp) {
@@ -676,13 +696,6 @@ ResponsiveInspectorPopup.prototype = {
 
     btnDiscard_clickHandler: function btnDiscard_clickHandler(event) {
         $('body').attr('data-state', 'media-queries');
-    },
-
-    oauth_loadHandler: function oauth_loadHandler(event) {
-        var $oauthIFrame = $(this);
-
-        console.log('location:', this.contentWindow.location);
-
     },
 
     showAlert: function showAlert(type, message) {

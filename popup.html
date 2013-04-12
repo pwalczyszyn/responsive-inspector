@@ -33,6 +33,14 @@
                     <img src="images/ico-zoomin.png" />
                 </a>
             </div>
+            <div id="publish-buttons">
+                <button type="button" id="btn-publish">
+                    <img src="images/btn-share.png" />
+                </button>
+                <button type="button" id="btn-discard-publish">
+                    <img src="images/btn-discard.png" />
+                </button>
+            </div>
         </header>
         <div id="content">
             <div id="media-queries-container">
@@ -51,34 +59,31 @@
                 </div>
             </div>
             <div id="preview"></div>
-            <div id="share" data-state="authorize">
-                <div id="authorize-info">
-                    <img src="images/behance-icon.png" />
-                    <br/>
-                    <button type="button">Authorize</button>
+            <div id="authorize">
+                <img src="images/authorization-info.png" />
+                <br/>
+                <button type="button" class="blue-button">Authorize</button>
+                <p>Responsive Inspector app needs to be authorized with Behance service.</p>
+            </div>
+            <div id="publish">
+                <div id="wip-preview">
+                    <img/>
                 </div>
-                <div id="wip">
-                    <div id="wip-preview">
-                        <img/>
-                    </div>
-                    <div id="wip-info">
-                        <label for="lst-wips">Existing WIPs</label>
-                        <select id="lst-wips">
-                        </select>
-                        <label for="wip-title">Title</label>
-                        <input type="text" name="wip-title" id="wip-title" required>
-                        <label for="wip-description">Description</label>
-                        <textarea name="wip-description" id="wip-description" required></textarea>
-                        <label for="wip-tags">Tags (, comma separated)</label>
-                        <input type="text" name="wip-tags" id="wip-tags" required>
-                        <label for="wip-privacy">Privacy</label>
-                        <select id="wip-privacy">
-                            <option value="public">Public</option>
-                            <option value="feedback_circle">Feedback circle</option>
-                        </select>
-                        <input type="button" id="btn-wip-share" value="Share" />
-                    </div>
-                </div>
+                <form id="wip-info">
+                    <label for="lst-wips">Existing WIPs</label>
+                    <select id="lst-wips"></select>
+                    <label for="wip-title">Title</label>
+                    <input type="text" name="wip-title" id="wip-title" required>
+                    <label for="wip-description">Description</label>
+                    <textarea name="wip-description" id="wip-description" required></textarea>
+                    <label for="wip-tags">Tags</label>
+                    <input type="text" name="wip-tags" id="wip-tags" placeholder=", comma separated" required>
+                    <label for="wip-privacy">Privacy</label>
+                    <select id="wip-privacy">
+                        <option value="public">Public</option>
+                        <option value="feedback_circle">Feedback circle</option>
+                    </select>
+                </form>
             </div>
         </div>
     </body>

@@ -1,17 +1,30 @@
+@font-face {
+    font-family: source;
+    src: url("../fonts/SourceSansPro-Regular.otf") format("opentype");
+}
+@font-face {
+    font-family: source;
+    font-weight: lighter;
+    src: url("../fonts/SourceSansPro-Light.otf") format("opentype");
+}
+@font-face {
+    font-family: source;
+    font-weight:bold;
+    src: url("../fonts/SourceSansPro-Bold.otf") format("opentype");
+}
 body {
     color: #bbb;
-    font: 12px verdana;
     margin: 0;
     height: 100%;
     width: 660px;
     border-radius: 3px;
     padding:3px;
     overflow-y: auto;
+    font-size:14px;
+    font-family:source, Tahoma, Arial, sans-serif;
 }
 * {
     box-sizing: border-box;
-    font-family: Tahoma, Arial, sans-serif;
-    font-size:100%;
 }
 h2 {
     margin-top:5px;
@@ -23,6 +36,21 @@ div {
 }
 header {
     height:50px;
+}
+.blue-button {
+    border:none;
+    background: -webkit-linear-gradient(120deg, rgb(6, 95, 195) 0%, rgb(2, 118, 248) 100%);
+    border-bottom: 1px solid rgb(4, 70, 145);
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    color:#fff;
+    line-height:2em;
+    text-transform:uppercase;
+    padding-left:10px;
+    padding-right:10px;
+    letter-spacing:2px;
 }
 .app-name {
     font-size: 20px;
@@ -56,7 +84,7 @@ body[data-state="media-queries"] #media-queries-container {
     width:100%;
     overflow:hidden;
     white-space: nowrap;
-    font-size:8px;
+    font-size:9px;
     font-weight:100;
 }
 #media-queries-buttons {
@@ -92,24 +120,29 @@ body[data-state="media-queries"] #media-queries-buttons {
 }
 .width-marker {
     position:absolute;
-    width:42px;
-    height:45px;
-    top:27px;
+    width:75px;
+    height:65px;
+    top:7px;
     color:#b7b7b7;
-    background: url('../images/snapshot.png') 0 0 no-repeat;
-    font-size:9px;
-    font-weight:700;
-    padding-top:6px;
+    background: url('../images/width-marker.png') 0 0 no-repeat;
+    font-weight:100;
+    padding-top:8px;
     text-align:center;
 }
-.width-marker:hover {
-    color:#fff;
-    cursor:pointer;
+.width-marker.snapped {
+    color:#FFE303;
+}
+.width-marker div {
+    width:100%;
+    margin-top:5px;
 }
 .width-marker img {
     opacity:0.8;
+    padding-left:6px;
+    padding-right:6px;
+    cursor:pointer;
 }
-.width-marker:hover img {
+.width-marker img:hover {
     opacity:1;
 }
 .width-marker-line {
@@ -307,7 +340,18 @@ body[data-state="preview"] #preview-buttons {
     cursor:pointer;
     text-decoration:none;
 }
-#share {
+#authorize {
+    display:none;
+    text-align:center;
+    font-size:14px;
+}
+body[data-state="authorize"] #authorize {
+    display:block;
+}
+#authorize > * {
+    margin-top:45px;
+}
+#publish {
     display:none;
     position:absolute;
     left:10px;
@@ -316,25 +360,15 @@ body[data-state="preview"] #preview-buttons {
     bottom:10px;
     overflow:auto;
 }
-body[data-state="share"] #share {
+body[data-state="publish"] #publish {
     display:block;
 }
-#share[data-state="authorize"] #authorize-info {
-    display:block;
-}
-#authorize-info {
+#publish-buttons {
     display:none;
-    text-align:center;
-    padding-top:100px;
 }
-#authorize-info img {
-    width:100px;
-}
-#share[data-state="wip"] #wip {
+body[data-state="publish"] #publish-buttons {
     display:block;
-}
-#wip {
-    display:none;
+    float:right;
 }
 #wip-preview {
     float:left;
@@ -355,17 +389,24 @@ body[data-state="share"] #share {
 }
 #wip-info * {
     display:block;
-    padding:3px;
     margin-bottom:4px;
 }
 #wip-info input, #wip-info textarea {
     width:90%;
+    padding:8px;
+    border:none;
 }
 #wip-info textarea {
     height:60px;
 }
-input:required:invalid, input:focus:invalid {
-    border: 1px solid #ff0000;
+:focus:invalid {
+    border: 2px solid #ff0000;
+}
+:focus {
+    outline:none;
+}
+input:required, textarea:required {
+    background: #fff url(../images/asterix.png) no-repeat 98% center;
 }
 .alert {
     position:absolute;
