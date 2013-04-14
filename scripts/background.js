@@ -1,7 +1,11 @@
 var loginToBehance = function loginToBehance() {
 
+    var CLIENT_ID = 'qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL',
+        CLIENT_SECRET = 'RseEnuSdTpDiqU9ognSVZUQ4sTCd8.QX',
+        REDIRECT_URI = 'http://outof.me/responsive-inspector/behance';
+
     chrome.tabs.create({
-        url: 'https://www.behance.net/v2/oauth/authenticate?client_id=qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL&redirect_uri=http%3A%2F%2Foutof.me&scope=wip_write&state=state'
+        url: 'https://www.behance.net/v2/oauth/authenticate?client_id=' + CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + '&scope=wip_write'
     }, function (tab) {
 
         chrome.tabs.onUpdated.addListener(function behanceOAuthTab(tabId, changeInfo, updatedTab) {
@@ -23,18 +27,19 @@ var loginToBehance = function loginToBehance() {
                 var req = new XMLHttpRequest();
                 req.open('POST', 'https://www.behance.net/v2/oauth/token', true);
                 req.onreadystatechange = function () {
+
+                    // TODO add error handling
                     if (req.readyState == 4 && req.status == 200) {
                         localStorage.setItem('behance_user_info', req.responseText);
                     }
 
-                    // TODO add error handling
                 }
 
                 var data = new FormData();
-                data.append('client_id', 'qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL');
-                data.append('client_secret', 'u8XcFRkv8ExgTd_QSFhcS76tJCL1v9Nw');
+                data.append('client_id', CLIENT_ID);
+                data.append('client_secret', CLIENT_SECRET);
                 data.append('code', props.code);
-                data.append('redirect_uri', 'http://outof.me');
+                data.append('redirect_uri', REDIRECT_URI);
                 data.append('grant_type', 'authorization_code');
 
                 req.send(data);

@@ -394,13 +394,13 @@ body[data-state="publish"] #publish-buttons {
 #wip-info input, #wip-info textarea {
     width:90%;
     padding:8px;
-    border:none;
+    border:1px solid rgba(0, 0, 0, 0);
 }
 #wip-info textarea {
     height:60px;
 }
 :focus:invalid {
-    border: 2px solid #ff0000;
+    border: 1px solid #ff0000 !important;
 }
 :focus {
     outline:none;
