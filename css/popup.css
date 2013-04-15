@@ -1,15 +1,19 @@
 @font-face {
     font-family: source;
-    src: url("../fonts/SourceSansPro-Regular.otf") format("opentype");
-}
-@font-face {
-    font-family: source;
-    font-weight: lighter;
+    font-weight: 100;
+    font-style: normal;
     src: url("../fonts/SourceSansPro-Light.otf") format("opentype");
 }
 @font-face {
     font-family: source;
+    font-weight: normal;
+    font-style: normal;
+    src: url("../fonts/SourceSansPro-Regular.otf") format("opentype");
+}
+@font-face {
+    font-family: source;
     font-weight:bold;
+    font-style: normal;
     src: url("../fonts/SourceSansPro-Bold.otf") format("opentype");
 }
 body {
@@ -37,27 +41,25 @@ div {
 header {
     height:50px;
 }
-.blue-button {
+a.button {
+    display:inline-block;
     border:none;
-    background: -webkit-linear-gradient(120deg, rgb(6, 95, 195) 0%, rgb(2, 118, 248) 100%);
-    border-bottom: 1px solid rgb(4, 70, 145);
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
-    color:#fff;
-    line-height:2em;
-    text-transform:uppercase;
-    padding-left:10px;
-    padding-right:10px;
-    letter-spacing:2px;
+    background-image: -webkit-linear-gradient(270deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, transparent 81%, transparent);
+    border-radius: 5px;
+}
+a.button:hover img {
+    opacity:0.9;
+}
+a.button:active img {
+    opacity:0.8;
 }
 .app-name {
+    display:inline-block;
+    padding-top: 11px;
+    padding-left: 10px;
     font-size: 20px;
     font-weight:700;
     color:#000;
-    line-height: 44px;
-    padding-left: 10px;
 }
 #content {
     position:relative;
@@ -201,28 +203,19 @@ body[data-state="media-queries"] #media-queries-buttons {
     overflow:hidden;
     opacity:0.6;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    -webkit-transition: all 0.25s ease-in-out;
-    -moz-transition: all 0.15s ease-in-out;
-    -o-transition: all 0.15s ease-in-out;
     transition: all 0.15s ease-in-out;
 }
 #lst-media-queries > li:hover {
     opacity:1;
     background-color: rgba(0, 0, 0, 0.25);
     animation: blink 10s ease-in-out infinite;
-    -moz-animation: blink 10s ease-in-out infinite;
-    -webkit-animation: blink 10s linear infinite;
 }
 .media-query-bar {
     position:absolute;
     height:100%;
     overflow:hidden;
-    border-radius: 3px;
     box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.0);
     background: url('../images/pattern-maxmin.png') repeat top left, url('../images/ico-eye-off.png') no-repeat 50% 50%, -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.0) 0%, rgba(0, 0, 0, 0.0) 100%);
-    -webkit-transition: all 0.15s ease-in-out;
-    -moz-transition: all 0.15s ease-in-out;
-    -o-transition: all 0.15s ease-in-out;
     transition: all 0.15s ease-in-out;
 }
 #lst-media-queries > li:hover > .media-query-bar {
@@ -231,29 +224,6 @@ body[data-state="media-queries"] #media-queries-buttons {
 }
 #lst-media-queries > li:hover > .media-query-bar:hover {
     cursor:pointer;
-}
-.btn-open-css {
-    position:absolute;
-    right:1px;
-    width:36px;
-    height:100%;
-    opacity: 0.65;
-    display:none;
-    -webkit-transition: all 0.15s ease-in-out;
-    -moz-transition: all 0.15s ease-in-out;
-    -o-transition: all 0.15s ease-in-out;
-    transition: all 0.15s ease-in-out;
-}
-.btn-open-css:hover {
-    opacity: 1;
-}
-#lst-media-queries > li:hover > .btn-open-css {
-    display:block;
-    background:url('../images/ico-code.png') no-repeat 50% 50%;
-    z-index:10;
-}
-#lst-media-queries > li:hover > .btn-open-css {
-    cursor: pointer;
 }
 .bar-min-label, .bar-max-label {
     color:#fff;
@@ -271,14 +241,34 @@ body[data-state="media-queries"] #media-queries-buttons {
     padding-left:6px;
     text-align:left;
 }
-.bar-min-label + .media-query-bar, .bar-max-label + .media-query-bar {
+.media-query-bar.min-max {
     border-radius: 3px;
 }
-.bar-min-label + .media-query-bar {
+.media-query-bar.min {
     border-radius: 3px 0px 0px 3px;
 }
-.bar-max-label + .media-query-bar {
+.media-query-bar.max {
     border-radius: 0px 3px 3px 0px;
+}
+.btn-open-css {
+    position:absolute;
+    right:1px;
+    width:36px;
+    height:100%;
+    opacity: 0.65;
+    display:none;
+    transition: all 0.15s ease-in-out;
+}
+.btn-open-css:hover {
+    opacity: 1;
+}
+#lst-media-queries > li:hover > .btn-open-css {
+    display:block;
+    background:url('../images/ico-code.png') no-repeat 50% 50%;
+    z-index:10;
+}
+#lst-media-queries > li:hover > .btn-open-css {
+    cursor: pointer;
 }
 #progress {
     display:none;
@@ -365,6 +355,8 @@ body[data-state="publish"] #publish {
 }
 #publish-buttons {
     display:none;
+    margin-top: 8px;
+    margin-right: 7px;
 }
 body[data-state="publish"] #publish-buttons {
     display:block;

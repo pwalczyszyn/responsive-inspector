@@ -317,6 +317,8 @@ ResponsiveInspectorPopup.prototype = {
 
                 barRight = mq.maxWidthValuePx == undefined ? 0 : (maxValue - mq.maxWidthValuePx) / maxValue * 100,
 
+                barClass = mq.minWidthValuePx != undefined && mq.maxWidthValuePx != undefined ? 'min-max' : (mq.maxWidthValuePx != undefined ? 'max' : 'min'),
+
                 $item = $('<li><div class="btn-open-css"/></li>').attr('title', 'mediaText: ' + mq.mediaText + '\n\nurl:' + mq.url);
 
             if (mq.minWidthValuePx == undefined) {
@@ -330,7 +332,7 @@ ResponsiveInspectorPopup.prototype = {
                 midColors = midColors.darken(-4);
             }
 
-            $('<div class="media-query-bar"/>').prependTo($item).css({
+            $('<div class="media-query-bar"/>').addClass(barClass).prependTo($item).css({
                 left: barLeft + '%',
                 right: barRight + '%',
                 'background-color': barColor
@@ -585,7 +587,7 @@ ResponsiveInspectorPopup.prototype = {
         $('body').attr('data-state', 'preview');
     },
 
-    btnSave_clickHandler: function btnShare_clickHandler(event) {
+    btnSave_clickHandler: function btnSave_clickHandler(event) {
         var that = event.data.that;
         chrome.tabs.sendMessage(that.tab.id, {
             'type': 'popupSaveDialog',
@@ -598,100 +600,115 @@ ResponsiveInspectorPopup.prototype = {
     btnShare_clickHandler: function btnShare_clickHandler(event) {
         var that = event.data.that;
 
-        var userInfo = JSON.parse(localStorage.getItem('behance_user_info'));
+        chrome.storage.sync.get('behance_user_info', function (data) {
 
-        if (userInfo) {
+            var userInfo = data.behance_user_info;
 
-            that.showProgressView('Getting user WIPs...');
+            if (userInfo) {
 
-            $.ajax({
-                type: 'GET',
-                url: 'http://www.behance.net/v2/users/' + userInfo.user.username + '/wips',
-                data: {
-                    api_key: 'qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL'
-                },
-                success: function (data, textStatus, jqXHR) {
-                    // Switching to share view
-                    $('body').attr('data-state', 'publish');
+                that.showProgressView('Getting user WIPs...');
 
-                    // Display preview
-                    $('#wip-preview').html('<img src="' + that.snapshotPath + '"/>');
+                $.ajax({
+                    type: 'GET',
+                    url: 'http://www.behance.net/v2/users/' + userInfo.user.username + '/wips',
+                    data: {
+                        api_key: 'qeTtQGLaIAIc2Hnv0sQdYCsGKernSaDL'
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        // Switching to share view
+                        $('body').attr('data-state', 'publish');
 
-                    var wips = ['<option value="">New...</option>'];
-                    for (var i in data.wips) {
-                        var wip = data.wips[i];
-                        wips.push('<option value="' + wip.id + '">' + wip.title + '</option>');
+                        // Display preview
+                        $('#wip-preview').html('<img src="' + that.snapshotPath + '"/>');
+
+                        var wips = ['<option value="">New...</option>'];
+                        for (var i in data.wips) {
+                            var wip = data.wips[i];
+                            wips.push($('<option value="' + wip.id + '">' + wip.title + '</option>').data('wip', wip)[0]);
+                        }
+
+                        var $lstWIPs = $('#lst-wips').html(wips);
+                        $lstWIPs.off('change').on('change', function () {
+                            var $option = $lstWIPs.find('option:selected');
+                            if ($option.val() == '') {
+                                $('#wip-title').val('').removeAttr('disabled');
+                            } else {
+                                var wip = $option.data('wip');
+                                $('#wip-title').val(wip.title).attr('disabled', true);
+                            }
+                        });
+
+                        $('#btn-publish-cancel').off('click').click(function () {
+                            // Switching back to preview state
+                            $('body').attr('data-state', 'preview');
+                        });
+
+                        $('#btn-publish').off('click').on('click', function () {
+
+                            if ($('#wip-info :invalid').length == 0) {
+
+                                var wipId = $lstWIPs.val(),
+                                    isNew = (wipId == ''),
+                                    url = 'https://www.behance.net/v2/wips' + (isNew ? '' : '/' + wipId) + '?access_token=' + userInfo.access_token,
+                                    data = new FormData();
+
+                                data.append('access_token', userInfo.access_token);
+                                data.append('title', $('#wip-title').val());
+                                data.append('description', $('#wip-description').val());
+                                data.append('tags', $('#wip-tags').val().replace(/ /g, '').replace(/,/g, '|'));
+                                data.append('image', that.blob, 'snapshot.jpg');
+                                data.append('privacy', $('#wip-privacy').val());
+
+                                // Showing progress view
+                                that.showProgressView(isNew ? 'Creating new WIP...' : 'Adding revision of existing WIP...');
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: url,
+                                    processData: false,
+                                    contentType: false,
+                                    data: data,
+                                    success: function (data, textStatus, jqXHR) {
+                                        that.showAlert('success', 'WIP saved successfully!');
+                                    },
+                                    error: function (jqXHR, textStatus, errorThrown) {
+                                        that.showAlert('error', 'Error saving WIP!');
+                                    },
+                                    complete: function () {
+                                        $('body').attr('data-state', 'preview');
+                                    }
+                                });
+
+                            }
+                        });
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log('error getting user wips', textStatus);
+                        alert('Something went wrong while getting user info: ' + errorThrown);
                     }
-
-                    var $lstWIPs = $('#lst-wips').html(wips);
-                    $lstWIPs.off('change').on('change', function () {
-                        var $option = $lstWIPs.find('option:selected');
-                        if ($option.val() == '') {
-                            $('#wip-title').val('').removeAttr('disabled');
-                        } else {
-                            $('#wip-title').val($option.text()).attr('disabled', true);
-                        }
-                    });
-
-                    var $btnWIPShare = $('#btn-publish').off('click').on('click', function () {
-
-                        if ($('#wip-info :invalid').length == 0) {
-
-                            var wipId = $lstWIPs.val(),
-                                isNew = (wipId == ''),
-                                url = 'https://www.behance.net/v2/wips' + (isNew ? '' : '/' + wipId) + '?access_token=' + userInfo.access_token,
-                                data = new FormData();
-
-                            data.append('access_token', userInfo.access_token);
-                            data.append('title', $('#wip-title').val());
-                            data.append('description', $('#wip-description').val());
-                            data.append('tags', $('#wip-tags').val().replace(/ /g, '').replace(/,/g, '|'));
-                            data.append('image', that.blob, 'snapshot.jpg');
-                            data.append('privacy', $('#wip-privacy').val());
-
-                            // Showing progress view
-                            that.showProgressView(isNew ? 'Creating new WIP...' : 'Adding revision of existing WIP...');
-
-                            $.ajax({
-                                type: 'POST',
-                                url: url,
-                                processData: false,
-                                contentType: false,
-                                data: data,
-                                success: function (data, textStatus, jqXHR) {
-                                    that.showAlert('success', 'WIP saved successfully!');
-                                },
-                                error: function (jqXHR, textStatus, errorThrown) {
-                                    that.showAlert('error', 'Error saving WIP!');
-                                },
-                                complete: function () {
-                                    $('body').attr('data-state', 'preview');
-                                }
-                            });
-
-                        }
-                    });
-
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.log('error getting user wips', textStatus);
-                    alert('Something went wrong while getting user info: ' + errorThrown);
-                }
-            });
-
-
-        } else {
-
-            // Switching to share view
-            $('body').attr('data-state', 'authorize');
-            // Registering click handler
-            $('#authorize-info button').click(function () {
-                chrome.runtime.getBackgroundPage(function (bp) {
-                    bp.loginToBehance();
                 });
-            });
 
-        }
+
+            } else {
+
+                // Switching to share view
+                $('body').attr('data-state', 'authorize');
+
+                // Registering click handler
+                $('#btn-authorize').off('click').click(function () {
+                    chrome.runtime.getBackgroundPage(function (bp) {
+                        bp.loginToBehance();
+                    });
+                });
+                $('#btn-authorize-cancel').off('click').click(function () {
+                    // Switching back to preview state
+                    $('body').attr('data-state', 'preview');
+                });
+
+
+            }
+        });
     },
 
     btnDiscard_clickHandler: function btnDiscard_clickHandler(event) {

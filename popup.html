@@ -12,16 +12,17 @@
     </head>
     
     <body data-state="media-queries">
+        <!-- media-queries authorize -->
         <header>
             <span class="app-name">Responsive Inspector</span>
             <div id="preview-buttons">
-                <a id="btn-save" href="#">
+                <a id="btn-save" href="#" class="button">
                     <img src="images/btn-save.png" />
                 </a>
-                <a id="btn-share" href="#">
+                <a id="btn-share" href="#" class="button">
                     <img src="images/btn-share.png" />
                 </a>
-                <a id="btn-discard" href="#">
+                <a id="btn-discard" href="#" class="button">
                     <img src="images/btn-discard.png" />
                 </a>
             </div>
@@ -34,12 +35,12 @@
                 </a>
             </div>
             <div id="publish-buttons">
-                <button type="button" id="btn-publish">
-                    <img src="images/btn-share.png" />
-                </button>
-                <button type="button" id="btn-discard-publish">
-                    <img src="images/btn-discard.png" />
-                </button>
+                <a id="btn-publish" class="button" href="#">
+                    <img src="images/btn-publish.png" />
+                </a>
+                <a id="btn-publish-cancel" class="button" href="#">
+                    <img src="images/btn-cancel.png" />
+                </a>
             </div>
         </header>
         <div id="content">
@@ -62,8 +63,13 @@
             <div id="authorize">
                 <img src="images/authorization-info.png" />
                 <br/>
-                <button type="button" class="blue-button">Authorize</button>
-                <p>Responsive Inspector app needs to be authorized with Behance service.</p>
+                <a id="btn-authorize" class="button" href="#">
+                    <img src="images/btn-authorize.png" />
+                </a>&nbsp;
+                <a id="btn-authorize-cancel" class="button" href="#">
+                    <img src="images/btn-cancel.png" />
+                </a>
+                <p>Responsive Inspector app needs to be authorized with Behance service, you will be redirected to behance.net website after clicking Authorize button.</p>
             </div>
             <div id="publish">
                 <div id="wip-preview">

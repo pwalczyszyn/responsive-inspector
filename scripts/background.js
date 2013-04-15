@@ -5,7 +5,7 @@ var loginToBehance = function loginToBehance() {
         REDIRECT_URI = 'http://outof.me/responsive-inspector/behance';
 
     chrome.tabs.create({
-        url: 'https://www.behance.net/v2/oauth/authenticate?client_id=' + CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + '&scope=wip_write'
+        url: 'https://www.behance.net/v2/oauth/authenticate?client_id=' + CLIENT_ID + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) + '&scope=wip_write&state=state'
     }, function (tab) {
 
         chrome.tabs.onUpdated.addListener(function behanceOAuthTab(tabId, changeInfo, updatedTab) {
@@ -30,7 +30,11 @@ var loginToBehance = function loginToBehance() {
 
                     // TODO add error handling
                     if (req.readyState == 4 && req.status == 200) {
-                        localStorage.setItem('behance_user_info', req.responseText);
+
+                        chrome.storage.sync.set({
+                            'behance_user_info': JSON.parse(req.responseText)
+                        });
+
                     }
 
                 }
