@@ -603,7 +603,6 @@ ResponsiveInspectorPopup.prototype = {
         chrome.storage.sync.get('behance_user_info', function (data) {
 
             var userInfo = data.behance_user_info;
-
             if (userInfo) {
 
                 that.showProgressView('Getting user WIPs...');
@@ -636,6 +635,13 @@ ResponsiveInspectorPopup.prototype = {
                                 var wip = $option.data('wip');
                                 $('#wip-title').val(wip.title).attr('disabled', true);
                             }
+                        });
+
+                        $('#btn-deauthorize').off('click').click(function () {
+                            chrome.storage.sync.remove('behance_user_info', function () {
+                                // Switching back to preview state
+                                $('body').attr('data-state', 'preview');
+                            });
                         });
 
                         $('#btn-publish-cancel').off('click').click(function () {
@@ -684,8 +690,8 @@ ResponsiveInspectorPopup.prototype = {
 
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        console.log('error getting user wips', textStatus);
-                        alert('Something went wrong while getting user info: ' + errorThrown);
+                        $('body').attr('data-state', 'preview');
+                        that.showAlert('error', 'Something went wrong while getting user info: ' + errorThrown);
                     }
                 });
 
@@ -705,8 +711,6 @@ ResponsiveInspectorPopup.prototype = {
                     // Switching back to preview state
                     $('body').attr('data-state', 'preview');
                 });
-
-
             }
         });
     },
@@ -716,7 +720,6 @@ ResponsiveInspectorPopup.prototype = {
     },
 
     showAlert: function showAlert(type, message) {
-
         $('<div class="alert ' + type + '"/>').html(message)
             .appendTo(document.body).delay(1).fadeIn('slow')
             .delay(2000).fadeOut('slow', function () {

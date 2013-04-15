@@ -400,6 +400,12 @@ body[data-state="publish"] #publish-buttons {
 input:required, textarea:required {
     background: #fff url(../images/asterix.png) no-repeat 98% center;
 }
+#btn-deauthorize {
+    position:absolute;
+    bottom:10px;
+    right:10px;
+    color:rgb(78, 78, 78);
+}
 .alert {
     position:absolute;
     z-index:1000;
