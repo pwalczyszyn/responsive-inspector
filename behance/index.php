@@ -43,6 +43,7 @@
             <div class="complete">
                 <span class="authorization-status">Authorization successful!</span>
                 <p>Responsive Inspector is now ready for your WIPs.</p>
+                <p>You can close this window now.</p>
             </div>
             <?php } else if ($state == 'error') { ?>
             <div class="error">
