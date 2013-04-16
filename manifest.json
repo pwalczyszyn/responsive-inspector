@@ -1,11 +1,13 @@
 {
     "name": "Responsive Inspector",
-    "version": "0.1",
+    "version": "1.0",
     "manifest_version": 2,
     "description": "Responsive Inspector allows inspecting page media queries.",
 
     "icons": {
-        "128": "images/icon.png"
+        "16": "images/icon16.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
     },
 
     "background": {
@@ -19,12 +21,15 @@
         "http://*/*",
         "https://*/*",
         "file:///*/*",
-        "file://localhost/*/*"
+        "file://*/*/*"
     ],
 
     "browser_action": {
         "default_title": "Responsive Inspector",
-        "default_icon": "images/icon.png",
+        "default_icon": {
+            "19": "images/icon19.png",
+            "38": "images/icon38.png"
+        },
         "default_popup": "popup.html"
     },
 

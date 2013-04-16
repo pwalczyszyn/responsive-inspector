@@ -191,6 +191,13 @@ body[data-state="media-queries"] #media-queries-buttons {
     border: none;
     -webkit-border-radius: 6px;
 }
+::-webkit-scrollbar-thumb:horizontal {
+    width: 50px;
+    background-color: rgba(255, 255, 255, 0.8);
+    opacity: 1;
+    border: none;
+    -webkit-border-radius: 6px;
+}
 #lst-media-queries {
     padding: 0;
     margin: 0 0 0;
