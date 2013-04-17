@@ -13,7 +13,7 @@ body {
     left: 0;
     right: 0;
     margin: auto;
-    width:480px;
+    max-width:480px;
     height:480px;
     text-align:center;
 }
