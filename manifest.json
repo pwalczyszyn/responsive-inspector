@@ -20,8 +20,7 @@
         "storage",
         "http://*/*",
         "https://*/*",
-        "file:///*/*",
-        "file://*/*/*"
+        "file:///*/*"
     ],
 
     "browser_action": {
