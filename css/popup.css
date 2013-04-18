@@ -41,7 +41,6 @@ div {
 header {
     height:50px;
 }
-
 .app-name {
     display:inline-block;
     padding-top: 11px;
@@ -142,15 +141,14 @@ body[data-state="media-queries"] #media-queries-buttons {
     width:1px;
     top:20px;
     bottom:0;
-    background-color:rgba(255,255,255,0.3);
-    box-shadow: 0px 0px 15px 2px rgba(255,255,255,0.10);
-    
+    background-color:rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 0px 15px 2px rgba(255, 255, 255, 0.10);
     transition: background-color 0.2s ease-in-out;
 }
 .width-marker-line.snapped {
     width: 2px;
-    background-color:rgba(255,255,255,0.9);
-    box-shadow: 0px 0px 25px 2px rgba(255,255,255,0.2);
+    background-color:rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 0px 25px 2px rgba(255, 255, 255, 0.2);
 }
 #lst-media-queries-container {
     position:absolute;
@@ -205,13 +203,13 @@ body[data-state="media-queries"] #media-queries-buttons {
     opacity:0.8;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.15s ease-in-out;
-    -webkit-filter: saturate(1);
+    /*    -webkit-filter: saturate(1);*/
 }
 #lst-media-queries > li:hover {
     opacity:1;
     background-color: rgba(0, 0, 0, 0.25);
     animation: blink 10s ease-in-out infinite;
-    -webkit-filter: saturate(1.5);
+    /*    -webkit-filter: saturate(1.5);*/
 }
 .media-query-bar {
     position:absolute;
@@ -355,28 +353,24 @@ a.button {
     border:none;
     /*padding: 7px 13px 5px;*/
     border-radius: 3px;
-    
     height: 37px;
-    
     color: #fff;
     font-weight: 700;
     letter-spacing: 0.1em;
     font-size: 1.1em;
-    text-shadow: 0px -1px 0px rgba(0,0,0,0.25);
-    
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.25);
     transition: all 0.2s ease-in-out;
 }
 a.button img {
     position: relative;
     top: 0px;
     padding: 10px 9px 7px 11px;
-    border-right: 1px solid rgba(0,0,0,0.3);
+    border-right: 1px solid rgba(0, 0, 0, 0.3);
 }
 a.button span {
     position: relative;
     top: -12px;
     padding: 5px 12px 5px 6px;
-    
 }
 #btn-save {
     background: #ed0021;
@@ -395,17 +389,17 @@ a.button span {
 }
 #btn-save:hover {
     color: #000;
-    text-shadow: 0px -1px 0px rgba(255,255,255,0.2);
+    text-shadow: 0px -1px 0px rgba(255, 255, 255, 0.2);
     background: #ee1735;
 }
 #btn-share:hover {
     color: #000;
-    text-shadow: 0px -1px 0px rgba(255,255,255,0.2);
+    text-shadow: 0px -1px 0px rgba(255, 255, 255, 0.2);
     background: #137ef7;
 }
 #btn-discard:hover {
     color: #000;
-    text-shadow: 0px -1px 0px rgba(255,255,255,0.2);
+    text-shadow: 0px -1px 0px rgba(255, 255, 255, 0.2);
     background: #626262;
 }
 #authorize {
