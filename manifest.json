@@ -1,6 +1,6 @@
 {
-    "name": "Responsive Inspector",
-    "version": "1.0",
+    "name": "Responsive Inspector (beta)",
+    "version": "0.9.1",
     "manifest_version": 2,
     "description": "Responsive Inspector allows inspecting page media queries.",
 
@@ -18,9 +18,7 @@
     "permissions": [
         "tabs",
         "storage",
-        "http://*/*",
-        "https://*/*",
-        "file:///*/*"
+        "<all_urls>"
     ],
 
     "browser_action": {
