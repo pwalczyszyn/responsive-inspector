@@ -5,6 +5,8 @@ ResponsiveInspectorPopup.prototype = {
 
     mediaQueries: null,
 
+    uniquesHelper: null,
+
     breakpoints: null,
 
     execute: function () {
@@ -15,6 +17,9 @@ ResponsiveInspectorPopup.prototype = {
 
         // Initializing breakpoints map
         this.breakpoints = {};
+
+        // Unique media queries helper
+        this.uniquesHelper = {};
 
         chrome.tabs.getSelected(null, function (tab) {
 
@@ -123,7 +128,12 @@ ResponsiveInspectorPopup.prototype = {
             var m = media[i];
 
             if (m.media) {
-                this.mediaQueries.push.apply(this.mediaQueries, this.parseMediaQueries(m.media.mediaText, m.url));
+                var uniqueKey = $.trim(m.url) + '#' + $.trim(m.media.mediaText);
+                if (this.uniquesHelper[uniqueKey] == undefined) {
+                    this.uniquesHelper[uniqueKey] = true;
+                    this.mediaQueries.push.apply(this.mediaQueries, this.parseMediaQueries(m.media.mediaText, m.url));
+                }
+
             } else {
                 this.parseExternalCSS(m.url);
             }
@@ -151,18 +161,17 @@ ResponsiveInspectorPopup.prototype = {
 
                 var query = {
                     url: url,
-                    mediaText: queryText
+                    mediaText: queryText,
+                    wholeMediaText: $.trim(mediaText)
                 };
 
                 for (var i = 0; i < widths.length / 3; i++) {
-
                     var minmax = widths[i * 3].indexOf('min') >= 0 ? 'min' : 'max';
 
                     query[minmax + 'WidthName'] = widths[i * 3];
                     query[minmax + 'WidthValue'] = Number(widths[i * 3 + 1]);
                     query[minmax + 'WidthUnit'] = String(widths[i * 3 + 2]).toLowerCase();
                     query[minmax + 'WidthValuePx'] = query[minmax + 'WidthUnit'] == 'px' ? query[minmax + 'WidthValue'] : query[minmax + 'WidthValue'] * 16;
-
                 }
 
                 // Adding query to results
@@ -185,21 +194,16 @@ ResponsiveInspectorPopup.prototype = {
         function processResult(data) {
             if (data) {
                 var mqs = data.match(/@media[\s\S]*?\{/gim);
-
                 for (var i in mqs) {
+                    var mediaText = mqs[i].substring(6, mqs[i].length - 1),
+                        uniqueKey = $.trim(url) + ' - ' + $.trim(mediaText);
 
-                    var mediaText = mqs[i].substring(6, mqs[i].length - 1);
+                    if (that.uniquesHelper[uniqueKey] == undefined) {
+                        that.uniquesHelper[uniqueKey] = true;
 
-                    // Filtering only unique queries
-                    var uniqueQueries = that.parseMediaQueries(mediaText, url).filter(function (mq) {
-                        return !that.mediaQueries.some(function (mq1) {
-                            return mq.url == mq1.url && mq.mediaText == mq1.mediaText;
-                        });
-                    });
-
-                    // Adding parsed media queries
-                    that.mediaQueries.push.apply(that.mediaQueries, uniqueQueries);
-
+                        // Adding parsed media queries
+                        that.mediaQueries.push.apply(that.mediaQueries, that.parseMediaQueries(mediaText, url));
+                    }
                 }
             }
         }
@@ -256,8 +260,6 @@ ResponsiveInspectorPopup.prototype = {
 
             // Sorting mediaQueries first
             this.mediaQueries.sort(function (a, b) {
-
-                console.log(a.mediaText);
 
                 var aMin = a.minWidthValuePx != undefined ? a.minWidthValuePx : null,
                     aMax = a.maxWidthValuePx != undefined ? a.maxWidthValuePx : null,
@@ -319,7 +321,7 @@ ResponsiveInspectorPopup.prototype = {
 
                 barClass = mq.minWidthValuePx != undefined && mq.maxWidthValuePx != undefined ? 'min-max' : (mq.maxWidthValuePx != undefined ? 'max' : 'min'),
 
-                $item = $('<li><div class="btn-open-css"/></li>').attr('title', 'mediaText: ' + mq.mediaText + '\n\nurl:' + mq.url);
+                $item = $('<li><div class="btn-open-css"/></li>').attr('title', 'mediaText: ' + mq.wholeMediaText + '\n\nurl:' + mq.url);
 
             if (mq.minWidthValuePx == undefined) {
                 barColor = topColors.hex();

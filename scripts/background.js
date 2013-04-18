@@ -97,7 +97,7 @@ var openStyleSheet = function openStyleSheet(mq) {
                 // Sending message to pretty print and to find mediaText
                 chrome.tabs.sendMessage(t.id, {
                     type: 'prettyPrint',
-                    data: mq.mediaText
+                    data: mq.wholeMediaText
                 });
 
             });
