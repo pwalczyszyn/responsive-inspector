@@ -17,13 +17,16 @@
             <span class="app-name">Responsive Inspector</span>
             <div id="preview-buttons">
                 <a id="btn-save" href="#" class="button">
-                    <img src="images/btn-save.png" />
+                    <img src="images/ico-save.png" />
+                    <span>SAVE FILE</span>
                 </a>
                 <a id="btn-share" href="#" class="button">
-                    <img src="images/btn-share.png" />
+                    <img src="images/ico-behance.png" />
+                    <span>SHARE</span>
                 </a>
                 <a id="btn-discard" href="#" class="button">
-                    <img src="images/btn-discard.png" />
+                    <img src="images/ico-delete.png" />
+                    <span>DISCARD</span>
                 </a>
             </div>
             <div id="media-queries-buttons">
@@ -96,6 +99,19 @@
                 <a id="btn-deauthorize" href="#">Deauthorize from Behance</a>
             </div>
         </div>
+        <!-- templates -->
+        <script id="width-marker-tpl" type="text/template">
+            <div class="width-marker">
+                <span/>
+                <div>
+                    <img id="btn-resize" title="Resize browser window." src="images/ico-resize.png"/>
+                    <img id="btn-snapshot" title="Take whole page screenshot." src="images/ico-camera.png"/>
+                </div>
+            </div>
+        </script>
+        <script id="width-marker-line-tpl" type="text/template">
+            <div class="width-marker-line"/>
+        </script>
     </body>
 
 </html>

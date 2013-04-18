@@ -41,18 +41,7 @@ div {
 header {
     height:50px;
 }
-a.button {
-    display:inline-block;
-    border:none;
-    background-image: -webkit-linear-gradient(270deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, transparent 81%, transparent);
-    border-radius: 5px;
-}
-a.button:hover img {
-    opacity:0.9;
-}
-a.button:active img {
-    opacity:0.8;
-}
+
 .app-name {
     display:inline-block;
     padding-top: 11px;
@@ -132,14 +121,14 @@ body[data-state="media-queries"] #media-queries-buttons {
     text-align:center;
 }
 .width-marker.snapped {
-    color:#FFE303;
+    color:#FFF;
 }
 .width-marker div {
     width:100%;
     margin-top:5px;
 }
 .width-marker img {
-    opacity:0.8;
+    opacity:0.75;
     padding-left:6px;
     padding-right:6px;
     cursor:pointer;
@@ -153,10 +142,15 @@ body[data-state="media-queries"] #media-queries-buttons {
     width:1px;
     top:20px;
     bottom:0;
-    background-color:#aaa;
+    background-color:rgba(255,255,255,0.3);
+    box-shadow: 0px 0px 15px 2px rgba(255,255,255,0.10);
+    
+    transition: background-color 0.2s ease-in-out;
 }
 .width-marker-line.snapped {
-    background-color:#FFE303;
+    width: 2px;
+    background-color:rgba(255,255,255,0.9);
+    box-shadow: 0px 0px 25px 2px rgba(255,255,255,0.2);
 }
 #lst-media-queries-container {
     position:absolute;
@@ -208,25 +202,27 @@ body[data-state="media-queries"] #media-queries-buttons {
     height:36px;
     width:100%;
     overflow:hidden;
-    opacity:0.6;
+    opacity:0.8;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.15s ease-in-out;
+    -webkit-filter: saturate(1);
 }
 #lst-media-queries > li:hover {
     opacity:1;
     background-color: rgba(0, 0, 0, 0.25);
     animation: blink 10s ease-in-out infinite;
+    -webkit-filter: saturate(1.5);
 }
 .media-query-bar {
     position:absolute;
     height:100%;
     overflow:hidden;
     box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.0);
-    background: url('../images/pattern-maxmin.png') repeat top left, url('../images/ico-eye-off.png') no-repeat 50% 50%, -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.0) 0%, rgba(0, 0, 0, 0.0) 100%);
+    background: -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.0) 0%, rgba(0, 0, 0, 0.0) 100%);
     transition: all 0.15s ease-in-out;
 }
 #lst-media-queries > li:hover > .media-query-bar {
-    background:url('../images/pattern-maxmin.png') repeat top left, url('../images/ico-eye.png') no-repeat 50% 50%, -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.12) 100%);
+    /*background:-webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.12) 100%);*/
     box-shadow:inset 0px 1px 0px rgba(255, 255, 255, 0.18);
 }
 #lst-media-queries > li:hover > .media-query-bar:hover {
@@ -248,14 +244,29 @@ body[data-state="media-queries"] #media-queries-buttons {
     padding-left:6px;
     text-align:left;
 }
-.media-query-bar.min-max {
+#lst-media-queries > li > .media-query-bar.min-max {
     border-radius: 3px;
+    background:url('../images/pattern-maxmin.png') repeat center center;
 }
-.media-query-bar.min {
+#lst-media-queries > li > .media-query-bar.min {
     border-radius: 3px 0px 0px 3px;
+    background:url('../images/pattern-min.png') no-repeat center left;
 }
-.media-query-bar.max {
+#lst-media-queries > li > .media-query-bar.max {
     border-radius: 0px 3px 3px 0px;
+    background:url('../images/pattern-max.png') no-repeat center right;
+}
+#lst-media-queries > li:hover > .media-query-bar.min-max {
+    border-radius: 3px;
+    background:url('../images/pattern-maxmin.png') repeat center center, -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.12) 100%);
+}
+#lst-media-queries > li:hover > .media-query-bar.min {
+    border-radius: 3px 0px 0px 3px;
+    background:url('../images/pattern-min.png') no-repeat center left, -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.12) 100%);
+}
+#lst-media-queries > li:hover > .media-query-bar.max {
+    border-radius: 0px 3px 3px 0px;
+    background:url('../images/pattern-max.png') no-repeat center right, -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.12) 100%);
 }
 .btn-open-css {
     position:absolute;
@@ -284,7 +295,7 @@ body[data-state="media-queries"] #media-queries-buttons {
     top:10px;
     right:10px;
     bottom:10px;
-    background-color:#3a3f42;
+    background-color:#222;
     z-index:20;
     overflow:auto;
 }
@@ -326,8 +337,6 @@ body[data-state="preview"] #preview {
 }
 #preview-buttons {
     display:none;
-    margin-top: 8px;
-    margin-right: 7px;
 }
 body[data-state="preview"] #preview-buttons {
     display:block;
@@ -336,6 +345,68 @@ body[data-state="preview"] #preview-buttons {
 #preview-buttons > * {
     cursor:pointer;
     text-decoration:none;
+}
+#preview-buttons a.button {
+    margin-left: 6px;
+    margin-top: 4px;
+}
+a.button {
+    display:inline-block;
+    border:none;
+    /*padding: 7px 13px 5px;*/
+    border-radius: 3px;
+    
+    height: 37px;
+    
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 1.1em;
+    text-shadow: 0px -1px 0px rgba(0,0,0,0.25);
+    
+    transition: all 0.2s ease-in-out;
+}
+a.button img {
+    position: relative;
+    top: 0px;
+    padding: 10px 9px 7px 11px;
+    border-right: 1px solid rgba(0,0,0,0.3);
+}
+a.button span {
+    position: relative;
+    top: -12px;
+    padding: 5px 12px 5px 6px;
+    
+}
+#btn-save {
+    background: #ed0021;
+    box-shadow: 0px 2px 0px #af0014, inset 0px 0px 0px 1px #af0014, inset 0px 2px 0px #ff203f, inset 0px -2px 0px #ff203f;
+    transition: all 0.2s ease-in-out;
+}
+#btn-share {
+    background: #026ee9;
+    box-shadow: 0px 2px 0px #0038cc, inset 0px 0px 0px 1px #0038cc, inset 0px 2px 0px #137ef7, inset 0px -2px 0px #137ef7;
+    transition: all 0.2s ease-in-out;
+}
+#btn-discard {
+    background: #525252;
+    box-shadow: 0px 2px 0px #161616, inset 0px 0px 0px 1px #161616, inset 0px 2px 0px #6f6f6f, inset 0px -2px 0px #6f6f6f;
+    transition: all 0.2s ease-in-out;
+}
+#btn-save:hover {
+    color: #000;
+    text-shadow: 0px -1px 0px rgba(255,255,255,0.2);
+    background: #ee1735;
+}
+#btn-share:hover {
+    color: #000;
+    text-shadow: 0px -1px 0px rgba(255,255,255,0.2);
+    background: #137ef7;
+}
+#btn-discard:hover {
+    color: #000;
+    text-shadow: 0px -1px 0px rgba(255,255,255,0.2);
+    background: #626262;
 }
 #authorize {
     display:none;

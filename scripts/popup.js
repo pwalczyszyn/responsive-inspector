@@ -302,9 +302,9 @@ ResponsiveInspectorPopup.prototype = {
         // Adding 16% to maxValue
         maxValue = Math.max(Math.round(maxValue * 1.16), (screen.width * 1.05));
 
-        var topColors = chroma.color('#eda221'),
-            midColors = chroma.color('#00FF00'),
-            bottomColors = chroma.color('#0000FF');
+        var topColors = chroma.color('#ff8400'),
+            midColors = chroma.color('#84ff00'),
+            bottomColors = chroma.color('#2ec6ff');
 
         var items = [];
         for (var i in this.mediaQueries) {
@@ -323,13 +323,13 @@ ResponsiveInspectorPopup.prototype = {
 
             if (mq.minWidthValuePx == undefined) {
                 barColor = topColors.hex();
-                topColors = topColors.darken(-4);
+                topColors = topColors.darken(-9).saturate(9);
             } else if (mq.maxWidthValuePx == undefined) {
                 barColor = bottomColors.hex();
-                bottomColors = bottomColors.darken(-4);
+                bottomColors = bottomColors.darken(4).saturate(8);
             } else {
                 barColor = midColors.hex();
-                midColors = midColors.darken(-4);
+                midColors = midColors.darken(4).saturate(8);
             }
 
             $('<div class="media-query-bar"/>').addClass(barClass).prependTo($item).css({
@@ -392,6 +392,14 @@ ResponsiveInspectorPopup.prototype = {
         }, this.ruler_mouseLeaveHandler);
     },
 
+    template: function template(tplId, data) {
+        var tpl = $(tplId).html().trim();
+        for (var prop in data) {
+            tpl = tpl.replace(new RegExp('{{' + prop + '}}', 'g'), data[prop]);
+        }
+        return tpl;
+    },
+
     $widthMarker: null,
     $widthMarkerLabel: null,
     $widthMarkerLine: null,
@@ -402,9 +410,9 @@ ResponsiveInspectorPopup.prototype = {
         var that = event.data.that;
 
         if (!that.$widthMarker) {
-            that.$widthMarker = $('<div class="width-marker"><span/><div><img id="btn-resize" src="images/ico-resize.png"/><img id="btn-snapshot" src="images/ico-camera.png"/></div></div>');
+            that.$widthMarker = $(that.template('#width-marker-tpl'));
             that.$widthMarkerLabel = that.$widthMarker.find('span');
-            that.$widthMarkerLine = $('<div class="width-marker-line"/>');
+            that.$widthMarkerLine = $(that.template('#width-marker-line-tpl'));
 
             that.$widthMarker.mouseenter({
                 that: that
