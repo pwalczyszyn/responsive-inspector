@@ -90,8 +90,6 @@ Snapshotter.prototype = {
 
             if (response) {
 
-                console.log('Taking screen shot at:', that.currentY);
-
                 chrome.tabs.captureVisibleTab(
                     that.tab.windowId, {
                     format: 'jpeg',
@@ -104,13 +102,14 @@ Snapshotter.prototype = {
                             that.canvas.width = that.snapshotWidth;
                             that.canvas.height = that.pageHeight;
                             that.canvasCtx = that.canvas.getContext('2d');
+                            that.canvasCtx.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
                         }
 
                         var image = new Image();
                         image.onload = function () {
 
                             // Drawing image on the canvas
-                            that.canvasCtx.drawImage(image, 0, that.currentY);
+                            that.canvasCtx.drawImage(image, 0, that.currentY * window.devicePixelRatio);
 
                             // Calculating next y position
                             var nextY = that.currentY + that.viewHeight;
@@ -142,7 +141,6 @@ Snapshotter.prototype = {
 
                                 // Saving snapshot
                                 that.saveSnapshot.call(that, that.canvas.toDataURL());
-
                             }
                         };
 
