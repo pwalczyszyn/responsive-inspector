@@ -41,6 +41,7 @@ ResponsiveInspectorPopup.prototype = {
                     }
                 });
             });
+
         });
 
         // Registering media queries view buttons handlers
