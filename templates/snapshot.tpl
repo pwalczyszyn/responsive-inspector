@@ -42,7 +42,7 @@
 <body>
 
     <div id="placehoder"><div id="placehoder-content">Your page will load here shortly!</div></div>
-    <iframe id="snapshot-iframe" src="{{src}}" sandbox="allow-same-origin allow-forms allow-scripts" seamless scrolling="no" height="100%" width="{{width}}px"></iframe>
+    <iframe id="snapshot-iframe" src="{{src}}" sandbox="allow-same-origin allow-forms allow-scripts" scrolling="no" height="100%" width="{{width}}px"></iframe>
 
 </body>
 </html>

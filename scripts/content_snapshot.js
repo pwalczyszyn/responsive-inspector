@@ -27,6 +27,21 @@ if (!window.isSnapshotInitialized) {
                     var iframe = document.getElementById('snapshot-iframe');
                     iframe.onload = function () {
 
+                        // Removing fixed headers
+                        var w = iframe.contentWindow,
+                            b = w.document.body
+                            ch = b.children;
+
+                        for (var i in ch) {
+                            var c = ch[i],
+                                s = w.getComputedStyle(c);
+
+                            if (s != null && s.position != undefined && s.position == 'fixed') {
+                                c.style['position'] = 'absolute';
+                            }
+                        }
+
+                        // Running callback
                         callback({
                             viewHeight: window.innerHeight,
                             pageHeight: iframe.contentWindow.document.height
