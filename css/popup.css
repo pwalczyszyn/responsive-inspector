@@ -160,6 +160,14 @@ body[data-state="media-queries"] #media-queries-buttons {
     overflow-y: auto;
     overflow-x: hidden;
 }
+#no-mq-info {
+    position:absolute;
+    top:48%;
+    width:100%;
+    text-align:center;
+    font-size:1.2em;
+    font-weight:100;
+}
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -213,11 +221,11 @@ body[data-state="media-queries"] #media-queries-buttons {
     box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.0);
     background: -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0.0) 0%, rgba(0, 0, 0, 0.0) 100%);
     transition: all 0.15s ease-in-out;
-/*    -webkit-filter: saturate(0.75);*/
+    /*    -webkit-filter: saturate(0.75);*/
 }
 #lst-media-queries > li:hover > .media-query-bar {
     box-shadow:inset 0px 1px 0px rgba(255, 255, 255, 0.18);
-/*    -webkit-filter: saturate(1);*/
+    /*    -webkit-filter: saturate(1);*/
 }
 #lst-media-queries > li:hover > .media-query-bar:hover {
     cursor:pointer;

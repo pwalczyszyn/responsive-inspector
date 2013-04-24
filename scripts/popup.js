@@ -299,6 +299,10 @@ ResponsiveInspectorPopup.prototype = {
                 return 0;
             });
 
+        } else { // There are no media queries on that site
+
+            $('#media-queries-container').append(this.template('#no-mq-info-tpl'));
+
         }
 
         // Adding 16% to maxValue

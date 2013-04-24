@@ -57,13 +57,13 @@ if (!window.isResponsiveInspectorInitialized) {
             div = document.createElement('div');
             div.id = 'responsive-inspector-resolution-info';
             div.innerHTML = '<span style="float:left; padding-left:15px; line-height:80px">⇤</span><span style="line-height:80px"> ' + window.innerWidth + 'px </span><span style="float:right; padding-right:15px; line-height:80px">⇥</span>';
-            div.style['position'] = 'absolute';
+            div.style['position'] = 'fixed';
             div.style['width'] = '220px';
             div.style['height'] = '80px';
             div.style['text-align'] = 'center';
             div.style['font'] = '30px verdana';
             div.style['right'] = '23px';
-            div.style['top'] = (window.innerHeight - 100) + 'px';
+            div.style['bottom'] = '23px';
             div.style['border-radius'] = '7px';
             div.style['background-color'] = '#ddd';
             div.style['opacity'] = 0;
