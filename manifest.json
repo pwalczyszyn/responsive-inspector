@@ -11,7 +11,7 @@
     },
 
     "background": {
-        "scripts": ["scripts/tabs_update_listener.js", "scripts/background.js"],
+        "scripts": ["scripts/css_parser.js", "scripts/tabs_update_listener.js", "scripts/background.js"],
         "persistent": false
     },
 
