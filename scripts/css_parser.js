@@ -110,11 +110,3 @@ CSSParser.prototype = {
     }
 
 }
-
-// CSSImportRule "@import url("../blaskan/style.css");"
-
-// CSSMediaRule 
-// {
-//    mediaText: "only screen and (-webkit-min-device-pixel-ratio: 2)",
-//    cssText: "@media only screen and (-webkit-min-device-pixel-ratio: 2) { ... }"
-// }
