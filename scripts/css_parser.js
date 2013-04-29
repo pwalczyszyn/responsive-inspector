@@ -57,7 +57,7 @@ CSSParser.prototype = {
             importRule.href = this.parseHref(url);
             importRule.mediaQueryList = this.parseMediaQueryList(importRule.importText.substring(importRule.importText.indexOf(url) + url.length + 1, importRule.importText.length - 1)); // Substring without @media part
 
-            console.log(importRule);
+            this.results.push(importRule);
         }
     },
 
@@ -71,8 +71,6 @@ CSSParser.prototype = {
     },
 
     parseMediaQueryList: function parseMediaQueryList(mediaText) {
-        console.log(mediaText);
-
         var results = [],
             mqTexts = mediaText.split(',');
 

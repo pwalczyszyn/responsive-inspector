@@ -17,6 +17,7 @@ if (!window.isContentMediaInitialized) {
     chrome.runtime.sendMessage({
         type: 'PAGE_INFO',
         styleSheets: styleSheets,
+        url: document.location.href,
         fontSize: style['font-size'] // Just in case mqs are in EMs
     });
 }
