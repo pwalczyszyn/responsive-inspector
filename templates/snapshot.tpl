@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width={{width}}px, initial-scale=1, maximum-scale=1">
     <title>{{title}}</title>
     <style type="text/css">
         body {

@@ -92,8 +92,7 @@ Snapshotter.prototype = {
 
                 chrome.tabs.captureVisibleTab(
                     that.tab.windowId, {
-                    format: 'jpeg',
-                    quality: 100
+                    format: 'png'
                 }, function (dataURI) {
                     if (dataURI) {
 
@@ -102,14 +101,15 @@ Snapshotter.prototype = {
                             that.canvas.width = that.snapshotWidth;
                             that.canvas.height = that.pageHeight;
                             that.canvasCtx = that.canvas.getContext('2d');
-                            that.canvasCtx.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+                            // that.canvasCtx.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
                         }
 
                         var image = new Image();
                         image.onload = function () {
 
                             // Drawing image on the canvas
-                            that.canvasCtx.drawImage(image, 0, that.currentY * window.devicePixelRatio);
+                            that.canvasCtx.drawImage(image, 0, that.currentY); //  * window.devicePixelRatio
+                            // that.canvasCtx.drawImage(image, 0, that.currentY * window.devicePixelRatio);
 
                             // Calculating next y position
                             var nextY = that.currentY + that.viewHeight;
@@ -164,11 +164,11 @@ Snapshotter.prototype = {
 
         // New Blob with stitched snapshots
         var blob = new Blob([new Uint8Array(array)], {
-            type: 'image/jpeg'
+            type: 'image/png'
         }),
 
             // come up with a filename
-            name = 'snapshot.jpg'; // -' + that.snapshotWidth + 'x' + that.pageHeight + '
+            name = 'snapshot.png';
 
         function onwriteend() {
             // open the file that now contains the blob

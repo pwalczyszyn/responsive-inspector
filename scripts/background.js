@@ -7,8 +7,6 @@ var loginToBehance = function loginToBehance() {
 
     chrome.tabs.onUpdated.addListener(function behanceOAuthTab(tabId, changeInfo, updatedTab) {
 
-        console.log('tab updated', changeInfo, updatedTab.url);
-
         if (tabId == openedTab.id && changeInfo.status == 'complete') {
 
             // Tab new url starts with REDIRECT_URI

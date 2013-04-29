@@ -186,49 +186,41 @@ ResponsiveInspectorPopup.prototype = {
     },
 
     parseExternalCSS: function parseExternalCSS(url) {
-        var that = this;
-
         // Incrementing counter value
         this.externalCSSsToParse++;
 
-        function processResult(data) {
+        var cssReq = new XMLHttpRequest;
+        cssReq.onload = function (event) {
+            var data = event.target.responseText;
             if (data) {
                 var mqs = data.match(/@media[\s\S]*?\{/gim);
                 for (var i in mqs) {
                     var mediaText = mqs[i].substring(6, mqs[i].length - 1),
                         uniqueKey = $.trim(url) + ' - ' + $.trim(mediaText);
 
-                    if (that.uniquesHelper[uniqueKey] == undefined) {
-                        that.uniquesHelper[uniqueKey] = true;
+                    if (this.uniquesHelper[uniqueKey] == undefined) {
+                        this.uniquesHelper[uniqueKey] = true;
 
                         // Adding parsed media queries
-                        that.mediaQueries.push.apply(that.mediaQueries, that.parseMediaQueries(mediaText, url));
+                        this.mediaQueries.push.apply(this.mediaQueries, this.parseMediaQueries(mediaText, url));
                     }
                 }
             }
-        }
+        }.bind(this);
 
-        $.ajax(url, {
-            dataType: 'text',
-            success: processResult,
+        cssReq.onerror = function (event) {
+            console.error('Error fetching css:', event.target.statusText);
+        }.bind(this);
 
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.error('Error fetching css:', errorThrown);
+        cssReq.onloadend = function () {
+            this.externalCSSsToParse--;
+            if (this.externalCSSsToParse == 0)
+                this.showResults();
 
-                // Workaround for file:// loading
-                if (url.indexOf('file://') == 0) {
-                    processResult(jqXHR.responseText);
-                }
+        }.bind(this);
 
-            },
-
-            complete: function () {
-                that.externalCSSsToParse--;
-                if (that.externalCSSsToParse == 0)
-                    that.showResults();
-            }
-        });
-
+        cssReq.open('GET', url, true);
+        cssReq.send();
     },
 
     addBreakpoints: function addBreakpoints($bar) {

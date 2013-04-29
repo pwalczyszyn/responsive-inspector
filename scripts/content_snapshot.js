@@ -29,8 +29,16 @@ if (!window.isSnapshotInitialized) {
 
                         // Removing fixed headers
                         var w = iframe.contentWindow,
-                            b = w.document.body
+                            b = w.document.body,
                             ch = b.children;
+
+//                        var viewport = w.document.querySelector('meta[name="viewport"]');
+//                        if (!viewport) {
+//                            viewport = w.document.createElement('meta');
+//                            viewport.setAttribute('name', 'viewport');
+//                            viewport.setAttribute('content', 'width=device-width, minimum-scale=1.0, maximum-scale=1.0');
+//                            w.document.head.appendChild(viewport);
+//                        }
 
                         for (var i in ch) {
                             var c = ch[i],
