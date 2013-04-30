@@ -73,31 +73,35 @@ TabsUpdateListener.prototype = {
 
             for (var i in message.styleSheets) {
                 var styleSheet = message.styleSheets[i];
+
                 if (styleSheet.type == 'style') {
 
                     try {
-                        var cssRules = (new CSSParser(styleSheet.innerText)).parse();
-                        this.processCSSRules(cssRules, tabInfo, message.url);
+                        var styleMQs = (new CSSParser(styleSheet.innerText, message.url)).parse();
+                        this.processCSSRules(styleMQs, tabInfo, message.url);
                     } catch (error) {
                         this.processParsingError(error, tabInfo, styleSheet);
                     }
 
                 } else if (styleSheet.type == 'link') {
 
+                    var linkMQs;
+
                     // In case media query is defined on link level
                     if (styleSheet.mediaText != '') {
 
                         try {
+                            // parseMediaQueryList(type, mediaText, cssText, href, declarationText)
 
-                            var linkRule = {
-                                type: 'CSSLinkRule',
-                                mediaText: styleSheet.mediaText,
-                                innerText: styleSheet.innerText,
-                                mediaQueryList: (new CSSParser('')).parseMediaQueryList(styleSheet.mediaText)
-                            };
+                            var linkMQs = (new CSSParser('', message.url)).parseMediaQueryList(
+                                'CSSLinkRule',
+                                styleSheet.mediaText,
+                                null,
+                                styleSheet.url,
+                                styleSheet.innerText);
 
                             // Adding to media queries list
-                            tabInfo.mediaQueries.push(linkRule);
+                            // tabInfo.mediaQueries.push(linkRule);
 
                         } catch (error) {
                             this.processParsingError(error, tabInfo, styleSheet);
@@ -105,8 +109,8 @@ TabsUpdateListener.prototype = {
 
                     }
 
-                    // Loading link content
-                    this.loadLinkCSS(styleSheet);
+                    this.loadLinkContent(styleSheet.url, message.url, linkMQs, tabInfo);
+
                 }
             }
 
@@ -116,13 +120,58 @@ TabsUpdateListener.prototype = {
         }
     },
 
+    loadLinkContent: function loadLinkContent(url, declarationUrl, linkMQs, tabInfo) {
+        // Loading link content
+        this.loadExternalCSS(url, function (responseText) {
+
+            console.log('Got link result...', tabInfo);
+
+            var cssRules = (new CSSParser(responseText, declarationUrl)).parse();
+            this.processCSSRules(cssRules, tabInfo, url);
+
+            for (var i in linkMQs) {
+                var mq = linkMQs[i];
+                mq.cssText = responseText;
+            }
+
+            tabInfo.mediaQueries.push.apply(tabInfo.mediaQueries, linkMQs);
+
+            tabInfo.activeLoaders--;
+            tabInfo.updateStatus();
+
+        }, function (statusText) {
+            console.log('Error link css:', statusText);
+        }, tabInfo);
+    },
+
     processCSSRules: function processCSSRules(cssRules, tabInfo, url) {
         for (var i in cssRules) {
             var rule = cssRules[i];
             if (rule.type == 'CSSImportRule') {
-                //                console.log('
 
+                var importUrl;
+                // Absolute path
+                if (rule.href.indexOf('http://') == 0 || rule.href.indexOf('https://') == 0 || rule.href.indexOf('file://') == 0) {
+                    importUrl = rule.href;
+                } else if (rule.href.indexOf('/') == 0) { // Relative to root
+                    var rooEnd = url.indexOf('/', url.indexOf('://') + 3);
+                    if (rooEnd == -1)
+                        importUrl = url + rule.href;
+                    else
+                        importUrl = url.substring(0, rooEnd) + rule.href;
+                } else { // Relative path
+                    var rooEnd = url.indexOf('/', url.indexOf('://') + 3);
+                    if (rooEnd == -1)
+                        importUrl = url + '/' + rule.href;
+                    else
+                        importUrl = url.substring(0, url.lastIndexOf('/') + 1) + rule.href;
+                }
 
+                this.loadExternalCSS(importUrl, function (responseText) {
+                    console.log('Got import result...');
+                }, function (statusText) {
+                    console.log('Error importing css:', statusText);
+                }, tabInfo);
 
             } else {
 
@@ -131,34 +180,24 @@ TabsUpdateListener.prototype = {
     },
 
     processParsingError: function processParsingError(error, tabInfo, styleSheet) {
-
+        console.log('Error parsing CSS', error);
     },
 
     loadExternalCSS: function loadExternalCSS(url, onLoad, onError, tabInfo) {
         tabInfo.activeLoaders++;
 
-        var cssReq = new XMLHttpRequest();
-        cssReq.onload = onLoad;
-        cssReq.onerror = onError;
-        cssReq.open('get', url, true);
-        cssReq.send();
-    },
-
-    loadLinkCSS: function loadLinkCSS(styleSheet) {
+        console.log('Loading external CSS:', url);
 
         var cssReq = new XMLHttpRequest();
-        cssReq.onload = function (e) {
-            (new CSSParser(cssReq.responseText)).parse();
+        cssReq.onload = function (event) {
+            onLoad.call(this, event.target.responseText);
         }.bind(this);
-
-        cssReq.onerror = function (e) {
-            console.error('Error fetching css:', e);
+        cssReq.onerror = function (error) {
+            onError.call(this, error.target.responseText);
         }.bind(this);
-
-        cssReq.open("get", styleSheet.url, true);
+        cssReq.open('GET', url, true);
         cssReq.send();
-
-    },
+    }
 
     //    loadDataStorage_: function () {
     //        chrome.storage.local.get({

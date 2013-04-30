@@ -1,6 +1,9 @@
-var CSSParser = function CSSParser(css) {
+var CSSParser = function CSSParser(css, declarationUrl) {
     // Removing commented fragments
     this.css = css.replace(/\/\*[^*]*\*+([^/*][^*]*\*+)*\//, '');
+
+    this.declarationUrl = declarationUrl;
+
     this.urlRegExp = /url\(\s*([\'|\"]\S*[\'|\"])\s*\)|[\'|\"]\S*[\'|\"]/gi;
 }
 
@@ -20,8 +23,7 @@ CSSParser.prototype = {
             cssLength = this.css.length;
 
         while ((pos = this.css.indexOf('@media', pos + 1)) >= 0) {
-            var mediaRule = {},
-                mte = this.css.indexOf('{', pos), // cssText opening bracket position
+            var mte = this.css.indexOf('{', pos), // cssText opening bracket position
                 ob = 1, // Opening brackets count
                 cb = 0, // Closing brackets count
                 chPos = mte + 1;
@@ -33,12 +35,15 @@ CSSParser.prototype = {
                 chPos++;
             }
 
-            mediaRule.type = 'CSSMediaRule';
-            mediaRule.mediaText = this.css.substring(pos, mte).trim().toLowerCase();
-            mediaRule.cssText = this.css.substring(mte, chPos);
-            mediaRule.mediaQueryList = this.parseMediaQueryList(mediaRule.mediaText.substring(6)); // Substring without @media part
+            var declarationText = this.css.substring(pos, mte).trim(),
+                mediaQueryList = this.parseMediaQueryList(
+                    'CSSMediaRule',
+                    declarationText,
+                    this.css.substring(mte, chPos),
+                    null,
+                    declarationText);
 
-            this.results.push(mediaRule);
+            this.results.push.apply(this.results, mediaQueryList);
         }
     },
 
@@ -50,14 +55,16 @@ CSSParser.prototype = {
             var importRule = {},
                 ite = this.css.indexOf(';', pos);
 
-            importRule.type = 'CSSImportRule';
-            importRule.importText = this.css.substring(pos, ite + 1).trim();
+            var declarationText = this.css.substring(pos, ite + 1).trim(),
+                url = declarationText.match(this.urlRegExp)[0],
+                mediaQueryList = this.parseMediaQueryList(
+                    'CSSImportRule',
+                    declarationText,
+                    null,
+                    this.parseHref(url),
+                    declarationText);
 
-            var url = importRule.importText.match(this.urlRegExp)[0];
-            importRule.href = this.parseHref(url);
-            importRule.mediaQueryList = this.parseMediaQueryList(importRule.importText.substring(importRule.importText.indexOf(url) + url.length + 1, importRule.importText.length - 1)); // Substring without @media part
-
-            this.results.push(importRule);
+            this.results.push.apply(this.results, mediaQueryList);
         }
     },
 
@@ -70,16 +77,21 @@ CSSParser.prototype = {
         return url.substring(url.indexOf(separator) + 1, url.lastIndexOf(separator));
     },
 
-    parseMediaQueryList: function parseMediaQueryList(mediaText) {
+    parseMediaQueryList: function parseMediaQueryList(type, mediaText, cssText, href, declarationText) {
         var results = [],
-            mqTexts = mediaText.split(',');
+            mqTexts = mediaText.replace(/@import|@media|;/, '').split(','); // stripping and splitting
 
         for (var i in mqTexts) {
             var mqText = mqTexts[i].trim(),
                 mq = {
+                    type: type,
                     mediaType: 'all', // if not all it will get overriden
                     mediaText: mqText, // mediaText after , split
-                    expressions: []
+                    expressions: [],
+                    cssText: cssText,
+                    href: href,
+                    declarationText: declarationText,
+                    declarationUrl: this.declarationUrl
                 },
                 andSplits = mqText.split('and');
 
