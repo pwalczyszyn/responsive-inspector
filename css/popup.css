@@ -154,7 +154,7 @@ body[data-state="media-queries"] #media-queries-buttons {
     bottom:0;
     width:100%;
     border-radius: 4px;
-    background: -webkit-linear-gradient(top, #1d1d1d 1%, #323232 50%, #1d1d1d 99%);
+/*  This is set in code  background: url('../images/browser-width-line.png') repeat-y 50% 0, -webkit-linear-gradient(top, #1d1d1d 1%, #323232 50%, #1d1d1d 99%);*/
     box-shadow: inset 0px 3px 7px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 1px rgba(255, 255, 255, 0.06);
     padding:1px;
     overflow-y: auto;

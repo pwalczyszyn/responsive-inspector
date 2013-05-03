@@ -9,6 +9,8 @@ ResponsiveInspectorPopup.prototype = {
 
     breakpoints: null,
 
+    maxValue: null,
+
     execute: function () {
         var that = this;
 
@@ -17,6 +19,9 @@ ResponsiveInspectorPopup.prototype = {
 
         // Initializing breakpoints map
         this.breakpoints = {};
+
+        // Initial max value
+        this.maxValue = 0;
 
         // Unique media queries helper
         this.uniquesHelper = {};
@@ -92,31 +97,18 @@ ResponsiveInspectorPopup.prototype = {
         var that = event.data.that,
             mq = $(this).parent().data('mq');
 
-        chrome.windows.getCurrent(function (currentWindow) {
+        var width;
 
-            var width;
+        if (mq.minWidthValuePx == undefined)
+            width = mq.maxWidthValuePx;
+        else if (mq.maxWidthValuePx == undefined)
+            width = mq.minWidthValuePx;
+        else
+            width = mq.minWidthValuePx + (mq.maxWidthValuePx - mq.minWidthValuePx) / 2;
 
-            if (mq.minWidthValuePx == undefined)
-                width = mq.maxWidthValuePx;
-            else if (mq.maxWidthValuePx == undefined)
-                width = mq.minWidthValuePx;
-            else
-                width = mq.minWidthValuePx + (mq.maxWidthValuePx - mq.minWidthValuePx) / 2;
+        width = Math.round(width);
 
-            width = Math.round(width);
-
-            chrome.windows.update(currentWindow.id, {
-                width: width
-            }, function () {
-
-                chrome.tabs.sendMessage(that.tab.id, {
-                    'type': 'showResolution',
-                    'width': width
-                });
-
-            });
-        });
-
+        that.resizeWindow.call(that, width);
     },
 
     parseMedia: function parseMedia(media) {
@@ -242,10 +234,8 @@ ResponsiveInspectorPopup.prototype = {
 
     showResults: function showResults() {
 
-        var maxValue = 0;
-
         if (this.mediaQueries.length == 1) {
-            maxValue = Math.max(this.mediaQueries[0].minWidthValuePx ? this.mediaQueries[0].minWidthValuePx : 0,
+            this.maxValue = Math.max(this.mediaQueries[0].minWidthValuePx ? this.mediaQueries[0].minWidthValuePx : 0,
                 this.mediaQueries[0].maxWidthValuePx ? this.mediaQueries[0].maxWidthValuePx : 0);
 
         } else if (this.mediaQueries.length > 1) {
@@ -260,7 +250,7 @@ ResponsiveInspectorPopup.prototype = {
                     max = Math.max(aMin, aMax, bMin, bMax);
 
                 // Setting max value
-                if (max > maxValue) maxValue = max;
+                if (max > this.maxValue) this.maxValue = max;
 
                 if (aMin == null) {
 
@@ -298,7 +288,7 @@ ResponsiveInspectorPopup.prototype = {
         }
 
         // Adding 16% to maxValue
-        maxValue = Math.max(Math.round(maxValue * 1.16), (screen.width * 1.05));
+        this.maxValue = Math.max(Math.round(this.maxValue * 1.16), (screen.width * 1.05));
 
         var topColors = chroma.color('#ff8400'),
             midColors = chroma.color('#84ff00'),
@@ -311,9 +301,9 @@ ResponsiveInspectorPopup.prototype = {
 
                 barColor = null,
 
-                barLeft = mq.minWidthValuePx == undefined ? 0 : mq.minWidthValuePx / maxValue * 100,
+                barLeft = mq.minWidthValuePx == undefined ? 0 : mq.minWidthValuePx / this.maxValue * 100,
 
-                barRight = mq.maxWidthValuePx == undefined ? 0 : (maxValue - mq.maxWidthValuePx) / maxValue * 100,
+                barRight = mq.maxWidthValuePx == undefined ? 0 : (this.maxValue - mq.maxWidthValuePx) / this.maxValue * 100,
 
                 barClass = mq.minWidthValuePx != undefined && mq.maxWidthValuePx != undefined ? 'min-max' : (mq.maxWidthValuePx != undefined ? 'max' : 'min'),
 
@@ -360,34 +350,46 @@ ResponsiveInspectorPopup.prototype = {
             .on('click', '.btn-open-css', this.styleSheetOpen_clickHandler);
 
         // Drawing ruler
-        this.drawRuler(maxValue);
-
+        this.drawRuler();
     },
 
-    drawRuler: function drawRuler(maxValue) {
+    drawRuler: function drawRuler() {
         var $ruler = $('#media-queries-ruler'),
             SEGMENT_PX = 250,
-            segmentWidth = SEGMENT_PX / maxValue * 100,
-            segmentsCount = Math.ceil(maxValue / SEGMENT_PX),
+            segmentWidth = (SEGMENT_PX / this.maxValue * 100),
+            segmentsCount = Math.ceil(this.maxValue / SEGMENT_PX),
             segments = [];
 
         for (var i = 0; i < segmentsCount; i++) {
             segments.push('<div class="ruler-segment" style="width:' + segmentWidth + '%' + '">' + (i * SEGMENT_PX) + 'px</div>');
         }
 
-        $ruler.html(segments).css('padding-right', ($ruler.width() - $('#lst-media-queries').width()) + 'px');
+        $ruler.html(segments).css('padding-right', $ruler.width() - $('#lst-media-queries').width() + 'px');
+
+        this.drawBrowserWidth();
 
         $ruler.mouseenter({
             that: this
         }, this.ruler_mouseEnterHandler);
         $ruler.mousemove({
             that: this,
-            maxValue: maxValue,
             SEGMENT_PX: SEGMENT_PX
         }, this.ruler_mouseMoveHandler);
         $ruler.mouseleave({
             that: this
         }, this.ruler_mouseLeaveHandler);
+    },
+
+    drawBrowserWidth: function drawBrowserWidth() {
+        chrome.windows.getCurrent(function (currentWindow) {
+
+            var $listContainer = $('#lst-media-queries-container'),
+                gradientStyle = $listContainer.data('gradient'),
+                left = (currentWindow.width / this.maxValue * 100) * ($('#lst-media-queries').width() / $listContainer.width());
+
+            $listContainer.attr('style', 'background: url("images/browser-width-line.png") repeat-y ' + left + '% 0, ' + gradientStyle);
+
+        }.bind(this));
     },
 
     template: function template(tplId, data) {
@@ -446,10 +448,8 @@ ResponsiveInspectorPopup.prototype = {
             $ruler = $(this),
             // Ruler left position
             rulerLeft = $ruler.offset().left,
-            // Ruler max value
-            maxValue = event.data.maxValue,
             // Current value based on mouse pageX position
-            currentValue = Math.round((event.pageX - rulerLeft) / $ruler.width() * maxValue),
+            currentValue = Math.round((event.pageX - rulerLeft) / $ruler.width() * that.maxValue),
             // Direction in which mouse was moved
             moveDirection = event.pageX - that.prevRulerPageX < 0 ? -1 : 1;
 
@@ -487,10 +487,10 @@ ResponsiveInspectorPopup.prototype = {
         // Binding current value with width marker
         that.$widthMarker.data('currentValue', currentValue)
         // ruler left + current position inside the ruler - half of the width of $widthMarker
-        .css('left', rulerLeft + Math.round(currentValue / maxValue * $ruler.width()) - (that.$widthMarker.width() / 2));
+        .css('left', rulerLeft + Math.round(currentValue / that.maxValue * $ruler.width()) - (that.$widthMarker.width() / 2));
 
         // Positioning marker line
-        that.$widthMarkerLine.css('left', Math.round(currentValue / maxValue * $ruler.width()));
+        that.$widthMarkerLine.css('left', Math.round(currentValue / that.maxValue * $ruler.width()));
 
         // Applying snap colors
         if (snapPoint) {
@@ -527,22 +527,26 @@ ResponsiveInspectorPopup.prototype = {
         }, 150);
     },
 
+    resizeWindow: function resizeWindow(newWidth) {
+        var that = this;
+        chrome.windows.getCurrent(function (currentWindow) {
+            chrome.windows.update(currentWindow.id, {
+                width: newWidth
+            }, function () {
+                chrome.tabs.sendMessage(that.tab.id, {
+                    'type': 'showResolution',
+                    'width': currentWindow.width
+                });
+
+                that.drawBrowserWidth.call(that);
+            });
+        });
+    },
+
     btnResize_clickHandler: function btnResize_clickHandler(event) {
         var that = event.data.that,
             resizeWidth = that.$widthMarker.data('currentValue');
-
-        chrome.windows.getCurrent(function (currentWindow) {
-            chrome.windows.update(currentWindow.id, {
-                width: resizeWidth
-            }, function () {
-
-                chrome.tabs.sendMessage(that.tab.id, {
-                    'type': 'showResolution',
-                    'width': resizeWidth
-                });
-
-            });
-        });
+        that.resizeWindow.call(that, resizeWidth);
     },
 
     btnSnapshot_clickHandler: function btnSnapshot_clickHandler(event) {
