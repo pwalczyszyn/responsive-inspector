@@ -17,12 +17,6 @@ Snapshotter.prototype = {
 
     currentWindow: null,
 
-    viewHeight: null,
-
-    pageHeight: null,
-
-    currentY: null,
-
     canvas: null,
 
     canvasCtx: null,
@@ -63,94 +57,100 @@ Snapshotter.prototype = {
                     snapshotWidth: that.snapshotWidth
                 }
             }, function (response) {
-
                 if (response) {
-
-                    that.viewHeight = response.viewHeight;
-                    that.pageHeight = response.pageHeight;
-
                     // Starting from top
-                    that.scrollPage.call(that, that.currentY);
-
+                    that.scrollPage.call(that, true);
                 }
-
             });
         });
     },
 
-    scrollPage: function scrollPage(y) {
+    scrollPage: function scrollPage(fromStart) {
         var that = this;
 
         chrome.tabs.sendMessage(that.tab.id, {
             type: 'scrollPage',
             data: {
-                'y': y
+                fromStart: fromStart
             }
         }, function (response) {
 
             if (response) {
-
                 chrome.tabs.captureVisibleTab(
                     that.tab.windowId, {
                     format: 'png'
                 }, function (dataURI) {
                     if (dataURI) {
 
+                        // Creating new canvas if not exists yet
                         if (!that.canvas) {
                             that.canvas = document.createElement('canvas');
                             that.canvas.width = that.snapshotWidth;
-                            that.canvas.height = that.pageHeight;
+                            that.canvas.height = response.pageHeight;
                             that.canvasCtx = that.canvas.getContext('2d');
-                            // that.canvasCtx.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
                         }
 
-                        var image = new Image();
-                        image.onload = function () {
+                        // Checking if height didn't change
+                        if (that.canvas.height != response.pageHeight) {
+                            var newCanvas = document.createElement('canvas'),
+                                newContext = newCanvas.getContext('2d');
 
-                            // Drawing image on the canvas
-                            that.canvasCtx.drawImage(image, 0, that.currentY); //  * window.devicePixelRatio
-                            // that.canvasCtx.drawImage(image, 0, that.currentY * window.devicePixelRatio);
+                            newCanvas.width = that.snapshotWidth;
+                            newCanvas.height = response.pageHeight;
 
-                            // Calculating next y position
-                            var nextY = that.currentY + that.viewHeight;
+                            // Drawing image on new canvas
+                            newContext.drawImage(that.canvas, 0, 0);
 
-                            if (nextY != that.pageHeight && (nextY + that.viewHeight) > that.pageHeight)
-                                nextY = that.pageHeight - that.viewHeight;
+                            // Updating canvas with new object with different height
+                            that.canvas = newCanvas;
+                            that.canvasCtx = newContext;
+                        }
 
-                            if (nextY < that.pageHeight) {
-
-                                that.currentY = nextY;
-
-                                // Recursive call to scrollPage
-                                that.scrollPage.call(that, nextY, that.tab);
-
-                            } else {
-
-                                // Cleaning up
-                                chrome.tabs.sendMessage(that.tab.id, {
-                                    type: 'restore'
-                                }, function (response) {
-
-                                    if (that.initialWindowWidth < that.snapshotWidth) {
-                                        chrome.windows.update(that.currentWindow.id, {
-                                            width: that.initialWindowWidth
-                                        }, function () {});
-                                    }
-
-                                });
-
-                                // Saving snapshot
-                                that.saveSnapshot.call(that, that.canvas.toDataURL());
-                            }
-                        };
-
-                        // Setting source of image object
-                        image.src = dataURI;
-
+                        // Drawing current snapshot on canvas
+                        that.drawOnCanvas.call(that, response, dataURI);
                     }
                 });
             }
         });
+    },
+
+    drawOnCanvas: function drawOnCanvas(response, dataURI) {
+        var that = this,
+            image = new Image();
+
+        image.onload = function () {
+
+            // Drawing image on the canvas
+            that.canvasCtx.drawImage(image, 0, response.currentY); //  * window.devicePixelRatio
+
+            // Calculating next y position
+            if ((response.currentY + response.viewHeight) < response.pageHeight) {
+
+                // Recursive call to scrollPage
+                that.scrollPage.call(that, false);
+
+            } else {
+
+                // Cleaning up
+                chrome.tabs.sendMessage(that.tab.id, {
+                    type: 'restore'
+                }, function (response) {
+
+                    if (that.initialWindowWidth < that.snapshotWidth) {
+                        chrome.windows.update(that.currentWindow.id, {
+                            width: that.initialWindowWidth
+                        });
+                    }
+
+                });
+
+                // Saving snapshot
+                that.saveSnapshot.call(that, that.canvas.toDataURL());
+            }
+        };
+
+        // Setting source of image object
+        image.src = dataURI;
     },
 
     saveSnapshot: function saveSnapshot(dataURI) {

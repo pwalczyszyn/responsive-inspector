@@ -27,18 +27,13 @@ if (!window.isSnapshotInitialized) {
                     var iframe = document.getElementById('snapshot-iframe');
                     iframe.onload = function () {
 
+                        // Hiding placeholder element
+                        document.getElementById('placehoder-content').style['display'] = 'none';
+
                         // Removing fixed headers
                         var w = iframe.contentWindow,
                             b = w.document.body,
                             ch = b.children;
-
-//                        var viewport = w.document.querySelector('meta[name="viewport"]');
-//                        if (!viewport) {
-//                            viewport = w.document.createElement('meta');
-//                            viewport.setAttribute('name', 'viewport');
-//                            viewport.setAttribute('content', 'width=device-width, minimum-scale=1.0, maximum-scale=1.0');
-//                            w.document.head.appendChild(viewport);
-//                        }
 
                         for (var i in ch) {
                             var c = ch[i],
@@ -63,13 +58,20 @@ if (!window.isSnapshotInitialized) {
         }
 
         function scrollPage(data, callback) {
-            var iframe = document.getElementById('snapshot-iframe');
+            var iframe = document.getElementById('snapshot-iframe'),
+                viewHeight = iframe.contentWindow.innerHeight,
+                currentY = iframe.contentWindow.document.body.scrollTop,
+                scrollY = currentY + viewHeight;
+
+            if (data.fromStart) scrollY = 0;
 
             // Scrolling iframe content
-            iframe.contentWindow.scrollTo(0, data.y);
+            iframe.contentWindow.scrollTo(0, scrollY);
 
             setTimeout(function () {
                 callback({
+                    viewHeight: iframe.contentWindow.innerHeight,
+                    pageHeight: iframe.contentWindow.document.height,
                     currentY: iframe.contentWindow.document.body.scrollTop
                 });
             }, 500);
