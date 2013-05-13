@@ -88,6 +88,7 @@ Snapshotter.prototype = {
                             that.canvas.width = that.snapshotWidth;
                             that.canvas.height = response.pageHeight;
                             that.canvasCtx = that.canvas.getContext('2d');
+                            that.canvasCtx.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
                         }
 
                         // Checking if height didn't change
@@ -100,6 +101,9 @@ Snapshotter.prototype = {
 
                             // Drawing image on new canvas
                             newContext.drawImage(that.canvas, 0, 0);
+
+                            // Setting new canvas scaling
+                            newContext.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
 
                             // Updating canvas with new object with different height
                             that.canvas = newCanvas;
@@ -121,7 +125,7 @@ Snapshotter.prototype = {
         image.onload = function () {
 
             // Drawing image on the canvas
-            that.canvasCtx.drawImage(image, 0, response.currentY); //  * window.devicePixelRatio
+            that.canvasCtx.drawImage(image, 0, response.currentY * window.devicePixelRatio); //  * window.devicePixelRatio
 
             // Calculating next y position
             if ((response.currentY + response.viewHeight) < response.pageHeight) {

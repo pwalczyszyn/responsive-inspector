@@ -90,7 +90,7 @@ if (!window.isResponsiveInspectorInitialized) {
             });
         }
 
-        chrome.extension.onMessage.addListener(function (message, sender, callback) {
+        chrome.runtime.onMessage.addListener(function (message, sender, callback) {
 
             switch (message.type) {
                 case 'getMedia':

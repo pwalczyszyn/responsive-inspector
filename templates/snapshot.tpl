@@ -12,6 +12,7 @@
             overflow:hidden;
             font: 20px verdana;
             background-image: url({{bg-pattern}}); background-position: initial initial; background-repeat: initial initial;
+            transform: translate3d(0,0,0); /* HACK TO FORCE UNIQUE BEHAVIOUR ON RETINA */
         }
         iframe {
             position:absolute;

@@ -12,7 +12,7 @@ document.getElementsByTagName('pre')[0].className = 'prettyprint lang-css';
 document.getElementsByTagName('body')[0].style['background-color'] = '#302F2D';
 
 // Listening for messages from extension
-chrome.extension.onMessage.addListener(function (message, sender, callback) {
+chrome.runtime.onMessage.addListener(function (message, sender, callback) {
     if (message.type == 'prettyPrint') {
         prettyPrint(function () {
             window.find(message.data);
