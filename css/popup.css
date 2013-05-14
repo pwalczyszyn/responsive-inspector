@@ -161,12 +161,14 @@ body[data-state="media-queries"] #media-queries-buttons {
     overflow-x: hidden;
 }
 #no-mq-info {
-    position:absolute;
-    top:48%;
-    width:100%;
-    text-align:center;
-    font-size:1.2em;
-    font-weight:100;
+    position: absolute;
+    top: 47%;
+    width: 100%;
+    text-align: center;
+    font-size: 2.4em;
+    text-shadow: 0px -1px 0px #000;
+    font-weight: 300;
+    color: #ddd;
 }
 ::-webkit-scrollbar {
     width: 5px;
