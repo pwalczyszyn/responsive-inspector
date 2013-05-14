@@ -12,7 +12,6 @@
             overflow:hidden;
             font: 20px verdana;
             background-image: url({{bg-pattern}}); background-position: initial initial; background-repeat: initial initial;
-            transform: translate3d(0,0,0); /* HACK TO FORCE UNIQUE BEHAVIOUR ON RETINA */
         }
         iframe {
             position:absolute;
@@ -43,7 +42,7 @@
 </head>
 <body>
 
-    <div id="placehoder"><div id="placehoder-content">Your page will load here shortly!</div></div>
+    <div id="placehoder" style="-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)"><div id="placehoder-content">Your page will load here shortly!</div></div>
     <iframe id="snapshot-iframe" src="{{src}}" sandbox="allow-same-origin allow-forms allow-scripts" scrolling="no" height="100%" width="{{width}}px"></iframe>
 
 </body>
